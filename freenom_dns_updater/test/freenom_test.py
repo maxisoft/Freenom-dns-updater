@@ -2,22 +2,23 @@ import unittest
 
 import requests
 from freenom_dns_updater.freenom import Freenom
-import secret
-
+import os
 
 class FreenomTest(unittest.TestCase):
 
     def setUp(self):
         self.freenom = Freenom()
+        self.login = os.getenv("FREENOM_LOGIN", "default") # TODO
+        self.password = os.getenv("FREENOM_PASSWORD", "default") # TODO
 
     def test_init(self):
         self.assertIsInstance(self.freenom.session, requests.Session)
 
     def test_login(self):
-        self.assertTrue(self.freenom.login(secret.login, secret.password))
+        self.assertTrue(self.freenom.login(self.login, self.password))
 
     def test_login_fail(self):
-        self.assertFalse(self.freenom.login(secret.login, ""))
+        self.assertFalse(self.freenom.login(self.login, ""))
 
     def test__get_login_token(self):
         result = self.freenom._get_login_token()
