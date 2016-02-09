@@ -4,6 +4,7 @@ import requests
 from freenom_dns_updater.freenom import Freenom
 import os
 
+
 class FreenomTest(unittest.TestCase):
 
     def setUp(self):
