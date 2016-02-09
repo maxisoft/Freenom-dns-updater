@@ -1,7 +1,7 @@
 import unittest
 
 import requests
-from freenom_dns_updater.freenom import Freenom
+from freenom_dns_updater import Freenom
 import os
 
 

@@ -1,0 +1,1 @@
+from freenom_dns_updater.freenom import Freenom
