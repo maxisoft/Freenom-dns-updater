@@ -3,10 +3,16 @@ python:
   - "2.7"
   - "3.5"
   - "nightly" # currently points to 3.6-dev
+  
 # command to install dependencies
 install:
   - pip install -r test-requirements.txt
   - pip install -e .
 # command to run tests
 script: python tests.py
+
+os:
+  - linux
+  - osx
+
 cache: pip
