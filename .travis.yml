@@ -11,8 +11,4 @@ install:
 # command to run tests
 script: python tests.py
 
-os:
-  - linux
-  - osx
-
 cache: pip
