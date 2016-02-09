@@ -4,6 +4,8 @@ python:
   - "3.5"
   - "nightly" # currently points to 3.6-dev
 # command to install dependencies
-install: "pip install -e ."
+install:
+  - pip install -r test-requirements.txt
+  - pip install -e .
 # command to run tests
-script: "python tests.py"
+script: python tests.py

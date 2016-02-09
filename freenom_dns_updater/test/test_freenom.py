@@ -3,6 +3,7 @@ import unittest
 import requests
 from freenom_dns_updater import Freenom
 import os
+from past.builtins import basestring
 
 
 class FreenomTest(unittest.TestCase):
@@ -23,7 +24,7 @@ class FreenomTest(unittest.TestCase):
 
     def test__get_login_token(self):
         result = self.freenom._get_login_token()
-        self.assertIsInstance(result, str)
+        self.assertIsInstance(result, basestring)
         self.assertTrue(result)
 
     def test_is_logged_in(self):
