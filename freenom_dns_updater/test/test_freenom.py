@@ -63,7 +63,7 @@ class FreenomTest(unittest.TestCase):
         self.assertTrue(self.freenom.is_logged_in())
 
     def test_parse_domains(self):
-        path = pathlib.Path(__file__).parent / "ressources" / "domain_page.html"
+        path = pathlib.Path(__file__).parent / "resources" / "domain_page.html"
         with path.open() as f:
             html = f.read()
         domains = self.freenom.parse_domains(html)

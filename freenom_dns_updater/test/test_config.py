@@ -27,6 +27,7 @@ class ConfigTest(unittest.TestCase):
 
     def test_reload(self):
         self.config.reload(str(self.config_file))
+        self.test_get()
 
     def test_get(self):
         self.assertEqual('yourlogin@somemail.domain', self.config['login'])
