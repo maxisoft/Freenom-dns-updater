@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="post" id="bulkactionform" action="clientarea.php?action=bulkdomain">
+    <input type="hidden" name="token" value="5151515451659751621364209492367996c21026"/>
+    <input id="bulkaction" name="update" type="hidden"/>
+
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+
+            <th class="headerSortasc"><a href="clientarea.php?action=domains&orderby=domain">Domaine</a></th>
+            <th><a href="clientarea.php?action=domains&orderby=regdate">Date d'inscription</a></th>
+            <th><a href="clientarea.php?action=domains&orderby=nextexpirydate">Date d'expiration</a></th>
+            <th><a href="clientarea.php?action=domains&orderby=status">État</a></th>
+            <th>Type</th>
+            <th class="last">&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+
+
+        <tr>
+
+            <td><a href="http://domain.tk/" target="_blank">domain.tk <i
+                    style="font-size: 12px; color: #CCC;" class="fa fa-external-link"></i></a></td>
+            <td>2016-02-09</td>
+            <td>2017-02-09</td>
+            <td><span class="label borderRadius active">Active</span></td>
+            <td>Free</td>
+            <td>
+                <div class="btn-group">
+                    <a class="smallBtn whiteBtn pullRight" href="clientarea.php?action=domaindetails&id=1065251102">
+                        Manage Domain <i class="fa fa-cog"></i></a>
+                </div>
+            </td>
+        </tr>
+        <tr>
+
+            <td><a href="http://domain.tk/" target="_blank">domain2.tk <i
+                    style="font-size: 12px; color: #CCC;" class="fa fa-external-link"></i></a></td>
+            <td>2016-02-09</td>
+            <td>2017-02-09</td>
+            <td><span class="label borderRadius active">Active</span></td>
+            <td>Free</td>
+            <td>
+                <div class="btn-group">
+                    <a class="smallBtn whiteBtn pullRight" href="clientarea.php?action=domaindetails&id=1065285134">
+                        Manage Domain <i class="fa fa-cog"></i></a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</form>
+</body>
+</html>
