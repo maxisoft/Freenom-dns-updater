@@ -8,7 +8,7 @@ import tempfile
 import pathlib
 import shutil
 
-default_file = """
+default_file = u"""
 login: yourlogin@somemail.domain
 password: yourpassword
 """

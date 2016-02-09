@@ -3,7 +3,7 @@ import yaml
 
 class Config(dict):
     def __init__(self, file="freenom.yml", **kwargs):
-        super().__init__(**kwargs)
+        super(Config, self).__init__(**kwargs)
         self.file = file
         self.reload(file)
 

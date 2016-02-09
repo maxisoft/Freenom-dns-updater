@@ -12,7 +12,7 @@ from freenom_dns_updater import Freenom, Config, Domain
 
 class FreenomTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(FreenomTest, self).__init__(*args, **kwargs)
         self.config_file = self.find_freenom_config_file()
 
     def setUp(self):
