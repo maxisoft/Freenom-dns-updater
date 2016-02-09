@@ -14,6 +14,10 @@ with open('requirements.txt', encoding='utf-8') as f:
     install_requires = map(lambda line: line.strip(), f.readlines())
     install_requires = filter(lambda line: bool(line), install_requires)
 
+with open('test-requirements.txt', encoding='utf-8') as f:
+    test_requires = map(lambda line: line.strip(), f.readlines())
+    test_requires = filter(lambda line: bool(line), install_requires)
+
 setup(
     name='freenom dns updater',
 
@@ -55,18 +59,15 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
 
     # What does your project relate to?
-    keywords='freenom',
+    keywords='freenom dns',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude=("tests",)),
+    packages=find_packages(exclude=['freenom_dns_updater.test.*']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
@@ -84,7 +85,7 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'dev': ['check-manifest'],
-        'test': ['coverage'],
+        'test': list(test_requires),
     },
 
     # If there are data files included in your packages that need to be
