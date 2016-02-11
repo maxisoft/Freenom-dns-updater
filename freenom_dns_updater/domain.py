@@ -41,7 +41,7 @@ class Domain(object):
         return datetime.datetime.strptime(value, '%Y-%m-%d').date()
 
     def __str__(self, *args, **kwargs):
-        return "Domain(id={0.id}, name={0.name})".format(self)
+        return "Domain({.name})".format(self)
 
     def __repr__(self, *args, **kwargs):
         return "<{}({.id})>".format(self.__class__.__name__, self)

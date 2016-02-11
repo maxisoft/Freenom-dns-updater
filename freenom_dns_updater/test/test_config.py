@@ -1,12 +1,9 @@
-import unittest
-
-import requests
-from freenom_dns_updater import Freenom, Config
-import os
-import six
-import tempfile
 import pathlib
 import shutil
+import tempfile
+import unittest
+
+from freenom_dns_updater import Config
 
 default_file = u"""
 login: yourlogin@somemail.domain
