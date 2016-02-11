@@ -18,7 +18,7 @@ class Freenom(object):
                     'username': login,
                     'password': password}
         r = self.session.post(url, playload)
-        assert r, "could't get %s" % url
+        assert r, "couldn't get %s" % url
         return self.is_logged_in(r)
 
     def list_domain(self, url='https://my.freenom.com/clientarea.php?action=domains'):
@@ -26,7 +26,7 @@ class Freenom(object):
         playload = {'token': token,
                     'itemlimit': 'all'}
         r = self.session.post(url, playload)
-        assert r, "could't get %s" % url
+        assert r, "couldn't get %s" % url
         self.parse_domains(r.text)
 
     def parse_domains(self, raw_html):
@@ -52,7 +52,7 @@ class Freenom(object):
     def is_logged_in(self, r=None, url="https://my.freenom.com/clientarea.php"):
         if r is None:
             r = self.session.get(url)
-            assert r, "could't get %s" % url
+            assert r, "couldn't get %s" % url
         return '<li class="addFunds">' in r.text
 
     def _get_login_token(self, url="https://my.freenom.com/clientarea.php"):
@@ -63,7 +63,7 @@ class Freenom(object):
 
     def _get_token(self, url):
         r = self.session.get(url)
-        assert r, "could't get %s" % url
+        assert r, "couldn't get %s" % url
         soup = BeautifulSoup(r.text, "html.parser")
         token = soup.find("input", {'name': 'token'})
         assert token and token['value'], "there's no token on this page"
