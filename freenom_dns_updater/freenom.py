@@ -2,7 +2,11 @@ import re
 
 import requests
 from bs4 import BeautifulSoup, Tag
+from copy import copy
 
+from .record import Record
+from .domain import Domain
+from .exception import UpdateError, AddError, DnsRecordBaseException
 from .domain_parser import DomainParser
 from .record_parser import RecordParser
 
@@ -41,11 +45,115 @@ class Freenom(object):
             records.domain = domain
         return ret
 
-    def add_record(self, record, upsert=True):
-        pass
+    def add_record(self, record, upsert=True, records=None):
+        if records is None:
+            records = self.list_records(record.domain)
+        contains_record = self.contains_record(record, records)
+        if contains_record:
+            if upsert:
+                return self.update_record(record, records=records)
+            else:
+                return False
 
-    def update_record(self, record):
-        pass
+        url = self.manage_domain_url(record.domain)
+        token = self._get_manage_domain_token(url)
+        playload = {
+            'dnsaction': 'add',
+            'token': token
+        }
+        record_id = "addrecord[%d]" % 0
+        playload[record_id + "[name]"] = str(record.name)
+        playload[record_id + "[type]"] = record.type.name
+        playload[record_id + "[ttl]"] = str(record.ttl)
+        playload[record_id + "[value]"] = str(record.target)
+        playload[record_id + "[priority]"] = ""
+        playload[record_id + "[port]"] = ""
+        playload[record_id + "[weight]"] = ""
+        playload[record_id + "[forward_type]"] = "1"
+
+        r = self.session.post(url, data=playload)
+        soup = BeautifulSoup(r.text, "html.parser")
+        errs = soup.find_all(attrs={'class': 'dnserror'})
+        if errs:
+            raise AddError([e.text for e in errs], record, records)
+        return len(soup.find_all(attrs={'class': 'dnssuccess'}))
+
+    def update_record(self, record, records=None):
+        url = self.manage_domain_url(record.domain)
+        token = self._get_manage_domain_token(url)
+        playload = {
+            'dnsaction': 'modify',
+            'token': token
+        }
+
+        if records is None:
+            records = self.list_records(record.domain)
+        for i, rec in enumerate(records):
+            record_id = "records[%d]" % i
+            if rec.name == record.name and rec.type == record.type:
+                rec = record
+            playload[record_id + "[line]"] = ""
+            playload[record_id + "[type]"] = rec.type.name
+            playload[record_id + "[name]"] = str(rec.name)
+            playload[record_id + "[ttl]"] = str(rec.ttl)
+            playload[record_id + "[value]"] = str(rec.target)
+
+        r = self.session.post(url, data=playload)
+        soup = BeautifulSoup(r.text, "html.parser")
+        errs = soup.find_all(attrs={'class': 'dnserror'})
+        if errs:
+            raise UpdateError([e.text for e in errs], record, records)
+        return len(soup.find_all(attrs={'class': 'dnssuccess'}))
+
+    def remove_record(self, record, records=None):
+        if records is None:
+            records = self.list_records(record.domain)
+        if not self.contains_record(record, records):
+            return False
+        record = copy(record)
+        record.target = "-@^^ ac1a3!"  # somehow hacky, isn't ?
+        try:
+            self.update_record(record, records)
+        except UpdateError as e:
+            return True
+        return False
+
+    def contains_domain(self, domain, domains=None):
+        if domains is None:
+            domains = self.list_domains()
+        return any(domain.id == d.id and domain.name == d.name for d in domains)
+
+    def contains_record(self, record, records=None):
+        if records is None:
+            records = self.list_records(record.domain)
+        return any(record.name == rec.name and record.type == rec.type for rec in records)
+
+    def __contains__(self, item):
+        if isinstance(item, Domain):
+            return self.contains_domain(item)
+        if isinstance(item, Record):
+            return self.contains_record(item)
+        return False
+
+    def rollback_update(self, records):
+        if not records:
+            return False
+        url = self.manage_domain_url(records[0].domain)
+        token = self._get_manage_domain_token(url)
+        playload = {
+            'dnsaction': 'modify',
+            'token': token
+        }
+        for i, rec in enumerate(records):
+            record_id = "records[%d]" % i
+            playload[record_id + "[line]"] = ""
+            playload[record_id + "[type]"] = rec.type.name
+            playload[record_id + "[name]"] = str(rec.name)
+            playload[record_id + "[ttl]"] = str(rec.ttl)
+            playload[record_id + "[value]"] = str(rec.target)
+
+        return bool(self.session.post(url, data=playload))
+
 
     @staticmethod
     def manage_domain_url(domain):
@@ -61,6 +169,9 @@ class Freenom(object):
         return self._get_token(url)
 
     def _get_domain_token(self, url='https://my.freenom.com/clientarea.php?action=domains'):
+        return self._get_token(url)
+
+    def _get_manage_domain_token(self, url):
         return self._get_token(url)
 
     def _get_token(self, url):

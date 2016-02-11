@@ -6,11 +6,19 @@ from .domain import Domain
 
 class Record(object):
     def __init__(self):
-        self.name = ''
+        self._name = ''
         self._type = RecordType.A
-        self._ttl = int()
+        self._ttl = int(14440)
         self.target = ''
         self._domain = None
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = str(value).strip().upper()
 
     @property
     def ttl(self):
@@ -29,9 +37,9 @@ class Record(object):
         if isinstance(value, RecordType):
             self._type = value
         elif isinstance(value, six.string_types):
-            self.type = RecordType[value.strip().upper()]
+            self._type = RecordType[value.strip().upper()]
         elif isinstance(value, int):
-            self.type = RecordType(value)
+            self._type = RecordType(value)
         else:
             raise ValueError("bad type")
 

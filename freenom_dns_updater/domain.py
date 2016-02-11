@@ -32,9 +32,9 @@ class Domain(object):
         if isinstance(value, datetime.date):
             self._expire_date = value
         elif isinstance(value, datetime.datetime):
-            self.expire_date = value.date()
+            self._expire_date = value.date()
         else:
-            self.expire_date = self.parse_date(value)
+            self._expire_date = self.parse_date(value)
 
     @staticmethod
     def parse_date(value):
