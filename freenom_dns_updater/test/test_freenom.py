@@ -64,6 +64,15 @@ class FreenomTest(unittest.TestCase):
         self.test_login()
         self.assertTrue(self.freenom.is_logged_in())
 
+    def test_manage_domain_url(self):
+        domain = Domain()
+        domain.id = '1012700019'
+        domain.name = 'freenom-dns-updater.cf'
+        self.assertEqual(
+            'https://my.freenom.com/clientarea.php?managedns=freenom-dns-updater.cf&domainid=1012700019',
+            self.freenom.manage_domain_url(domain)
+        )
+
     def skipIfNoLogin(self):
         if self.login is None and self.password is None:
             self.skipTest("login and password are not set")

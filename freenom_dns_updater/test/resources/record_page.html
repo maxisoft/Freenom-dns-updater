@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<section class="domainContent">
+    <div class="row centered margin padding">
+        <div class="span12 pullLeft">
+            <div>
+
+
+                <ul style="list-style: none; margin-top: 15px; margin-left: 0px;">
+                    <li style="float: left;"><a href="/clientarea.php?action=domaindetails&amp;id=1012766519" title=""
+                                                class="btn">Back to domain details</a></li>
+                    <br>
+
+                </ul>
+                <div style="width: 100%; clear: both;"></div>
+
+                <form action="" method="post">
+                    <input name="token" value="4665113608ce01c5153165178916156160650545" type="hidden">
+                    <input name="dnsaction" value="modify" type="hidden">
+                    <table class="data table table-striped table-bordered" border="0" cellpadding="5" cellspacing="0"
+                           width="100%">
+                        <thead>
+                        <tr>
+                            <th align="left">Name</th>
+                            <th>Type</th>
+                            <th align="left">TTL</th>
+                            <th align="left">Target</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td valign="top"><input name="records[0][line]" value="" type="hidden"><input
+                                    name="records[0][type]" value="A" type="hidden"><input name="records[0][name]"
+                                                                                           value="" size="25"
+                                                                                           type="text"></td>
+                            <td valign="top"><strong>A</strong></td>
+                            <td valign="top"><input name="records[0][ttl]" value="14440" style="width: 60px"
+                                                    type="text"></td>
+                            <td style="width:28%" valign="top">
+                                <p style="padding: 0px 5px 0px 5px; overflow: auto;"><input name="records[0][value]"
+                                                                                            value="199.99.199.99"
+                                                                                            size="30" type="text"></p>
+                            </td>
+                            <td valign="top"><a
+                                    href="clientarea.php?managedns=domain.sexy&amp;page=&amp;records=A&amp;dnsaction=delete&amp;name=&amp;value=199.99.199.99&amp;line=&amp;ttl=14440&amp;priority=&amp;weight=&amp;port=&amp;domainid=1012766519"
+                                    onclick="if(confirm('Do you really want to remove this entry?')) return true; return false;"
+                                    class="deleter">Delete</a></td>
+                        </tr>
+                        <tr>
+                            <td valign="top"><input name="records[1][line]" value="" type="hidden"><input
+                                    name="records[1][type]" value="AAAA" type="hidden"><input name="records[1][name]"
+                                                                                              value="IPV6" size="25"
+                                                                                              type="text"></td>
+                            <td valign="top"><strong>AAAA</strong></td>
+                            <td valign="top"><input name="records[1][ttl]" value="14440" style="width: 60px"
+                                                    type="text"></td>
+                            <td style="width:28%" valign="top">
+                                <p style="padding: 0px 5px 0px 5px; overflow: auto;"><input name="records[1][value]"
+                                                                                            value="2a04:dd00::327b:8888"
+                                                                                            size="30" type="text"></p>
+                            </td>
+                            <td valign="top"><a
+                                    href="clientarea.php?managedns=domain.sexy&amp;page=&amp;records=AAAA&amp;dnsaction=delete&amp;name=&amp;value=2a04%3Add00%3A%3A327b%3A9f5d&amp;line=&amp;ttl=14440&amp;priority=&amp;weight=&amp;port=&amp;domainid=1012766519"
+                                    onclick="if(confirm('Do you really want to remove this entry?')) return true; return false;"
+                                    class="deleter">Delete</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn" style="margin: 20px; font-weight: bold">Save Changes</button>
+                </form>
+                <p style="font-weight:bold; font-size: 14px; margin-top: 30px;">Add Record</p>
+                <table class="data table table-striped table-bordered" style="display: none"
+                       id="add_record_table_example_template" border="0" cellpadding="5" cellspacing="0" width="100%">
+                    <thead></thead>
+                    <tbody>
+                    <tr>
+                        <td valign="top"><input name="addrecord[0][name]" value="" size="25" class="add_record_field"
+                                                type="text"></td>
+                        <td valign="top">
+                            <select name="addrecord[0][type]" class="selecttype add_record_field">
+                                <option value="A">A</option>
+                                <option value="AAAA">AAAA</option>
+                                <option value="CNAME">CNAME</option>
+                                <option value="LOC">LOC</option>
+                                <option value="MX">MX</option>
+                                <option value="NAPTR">NAPTR</option>
+                                <option value="RP">RP</option>
+                                <option value="TXT">TXT</option>
+                            </select>
+                        </td>
+                        <td valign="top"><input name="addrecord[0][ttl]" value="14440" style="width: 60px"
+                                                class="add_record_field" type="text"></td>
+                        <td style="width:225px" valign="top">
+                            <p style="padding: 0px 5px 0px 5px; overflow: auto;"><input name="addrecord[0][value]"
+                                                                                        value="" size="30"
+                                                                                        class="add_record_field"
+                                                                                        type="text"></p>
+                            <p style="padding: 5px; display: none; overflow: auto;" class="addpriority">
+                                <span>Priority:</span><input name="addrecord[0][priority]" value=""
+                                                             style="width:150px;float:right" class="add_record_field"
+                                                             type="text"></p>
+                            <p style="padding: 5px; display: none; overflow: auto;" class="addport">
+                                <span>Port:</span><input name="addrecord[0][port]" value=""
+                                                         style="width:150px;float:right" class="add_record_field"
+                                                         type="text"></p>
+                            <p style="padding: 5px; display: none; overflow: auto;" class="addweight">
+                                <span>Weight:</span><input name="addrecord[0][weight]" value=""
+                                                           style="width:150px;float:right" class="add_record_field"
+                                                           type="text"></p>
+                            <p style="padding: 5px; display: none; overflow: auto;" class="addforwardtype">
+                                <span>Type:</span><select name="addrecord[0][forward_type]"
+                                                          style="width:150px;float:right" class="add_record_field">
+                                <option value="1">Forward</option>
+                                <option value="2">Mask</option>
+                                <option value="3">301 Redirect</option>
+                            </select></p>
+                            <p style="padding: 5px; display: none; overflow: auto;" class="addforwardoptions"><span>Redirect to the exact URL:</span><input
+                                    name="addrecord[0][forward_url]" value="1" style="float:right"
+                                    class="add_record_field" type="checkbox"></p>
+                        </td>
+                        <td style="vertical-align:text-top;">
+                            <button class="smallBtn cautionColor pullRight" style="font-weight: bold"><i
+                                    class="fa fa-times"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <form action="" method="post">
+                    <input name="token" value="4665113608ce01c5153165178916156160650545" type="hidden">
+                    <input name="dnsaction" value="add" type="hidden">
+                    <table id="add_record_table" class="data table table-striped table-bordered" border="0"
+                           cellpadding="5" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th align="left">Name</th>
+                            <th>Type</th>
+                            <th align="left">TTL</th>
+                            <th align="left">Target</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td valign="top"><input name="addrecord[0][name]" value="" size="25" type="text"></td>
+                            <td valign="top">
+                                <select name="addrecord[0][type]" class="selecttype">
+                                    <option value="A">A</option>
+                                    <option value="AAAA">AAAA</option>
+                                    <option value="CNAME">CNAME</option>
+                                    <option value="LOC">LOC</option>
+                                    <option value="MX">MX</option>
+                                    <option value="NAPTR">NAPTR</option>
+                                    <option value="RP">RP</option>
+                                    <option value="TXT">TXT</option>
+                                </select>
+                            </td>
+                            <td valign="top"><input name="addrecord[0][ttl]" value="14440" style="width: 60px"
+                                                    type="text"></td>
+                            <td style="width:225px" valign="top">
+                                <p style="padding: 0px 5px 0px 5px; overflow: auto;"><input name="addrecord[0][value]"
+                                                                                            value="" size="30"
+                                                                                            type="text"></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addpriority"><span>Priority:</span><input
+                                        name="addrecord[0][priority]" value="" style="width:150px;float:right"
+                                        type="text"></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addport">
+                                    <span>Port:</span><input name="addrecord[0][port]" value=""
+                                                             style="width:150px;float:right" type="text"></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addweight">
+                                    <span>Weight:</span><input name="addrecord[0][weight]" value=""
+                                                               style="width:150px;float:right" type="text"></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addforwardtype"><span>Type:</span><select
+                                        name="addrecord[0][forward_type]" style="width:150px;float:right">
+                                    <option value="1">Forward</option>
+                                    <option value="2">Mask</option>
+                                    <option value="3">301 Redirect</option>
+                                </select></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addforwardoptions"><span>Redirect to the exact URL:</span><input
+                                        name="addrecord[0][forward_url]" value="1" style="float:right" type="checkbox">
+                                </p>
+                            </td>
+                            <td style="vertical-align:text-top;">
+                                <button class="smallBtn cautionColor pullRight" disabled="" style="font-weight: bold"><i
+                                        class="fa fa-times"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button id="add_record" class="smallBtn greyBtn" style="margin: 20px 0px 20px 5px;"><i
+                            class="fa fa-plus"></i> More Records
+                    </button>
+                    <button class="smallBtn primaryColor" style="margin: 20px 20px 20px 5px; font-weight: bold">Save
+                        Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
