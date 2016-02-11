@@ -23,8 +23,8 @@ class FreenomTest(unittest.TestCase):
             self.password = os.getenv("FREENOM_PASSWORD", self.config.password)
         else:
             self.config = None
-            self.login = os.getenv("FREENOM_LOGIN", "default")
-            self.password = os.getenv("FREENOM_PASSWORD", "default")
+            self.login = os.getenv("FREENOM_LOGIN", None)
+            self.password = os.getenv("FREENOM_PASSWORD", None)
 
     @staticmethod
     def find_freenom_config_file():
@@ -41,10 +41,11 @@ class FreenomTest(unittest.TestCase):
         self.assertIsInstance(self.freenom.session, requests.Session)
 
     def test_login(self):
+        self.skipIfNoLogin()
         self.assertTrue(self.freenom.login(self.login, self.password))
 
     def test_login_fail(self):
-        self.assertFalse(self.freenom.login(self.login, ""))
+        self.assertFalse(self.freenom.login("", ""))
 
     def test__get_token(self):
         result = self.freenom._get_login_token()
@@ -59,8 +60,13 @@ class FreenomTest(unittest.TestCase):
 
     def test_is_logged_in(self):
         self.assertFalse(self.freenom.is_logged_in())
+        self.skipIfNoLogin()
         self.test_login()
         self.assertTrue(self.freenom.is_logged_in())
+
+    def skipIfNoLogin(self):
+        if self.login is None and self.password is None:
+            self.skipTest("login and password are not set")
 
 
 if __name__ == '__main__':
