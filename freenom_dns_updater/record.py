@@ -1,6 +1,8 @@
 from enum import Enum, unique
 import six
 
+from .domain import Domain
+
 
 class Record(object):
     def __init__(self):
@@ -8,6 +10,7 @@ class Record(object):
         self._type = RecordType.A
         self._ttl = int()
         self.target = ''
+        self._domain = None
 
     @property
     def ttl(self):
@@ -32,6 +35,17 @@ class Record(object):
         else:
             raise ValueError("bad type")
 
+    @property
+    def domain(self):
+        return self._domain
+
+    @domain.setter
+    def domain(self, value):
+        if isinstance(value, Domain):
+            self._domain = value
+        else:
+            raise ValueError("bad type")
+
     def __str__(self, *args, **kwargs):
         return "Record({0.name}, {0.type.name} -> {0.target})".format(self)
 
@@ -48,6 +62,8 @@ class Record(object):
         if self.ttl != other.ttl:
             return False
         if self.target != other.target:
+            return False
+        if self.domain != other.domain:
             return False
         return True
 

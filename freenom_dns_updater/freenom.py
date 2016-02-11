@@ -24,7 +24,7 @@ class Freenom(object):
         assert r, "couldn't get %s" % url
         return self.is_logged_in(r)
 
-    def list_domain(self, url='https://my.freenom.com/clientarea.php?action=domains'):
+    def list_domains(self, url='https://my.freenom.com/clientarea.php?action=domains'):
         token = self._get_domain_token()
         playload = {'token': token,
                     'itemlimit': 'all'}
@@ -32,11 +32,20 @@ class Freenom(object):
         assert r, "couldn't get %s" % url
         return DomainParser.parse(r.text)
 
-    def list_record(self, domain):
+    def list_records(self, domain):
         url = self.manage_domain_url(domain)
         r = self.session.get(url)
         assert r, "couldn't get %s" % url
-        return RecordParser.parse(r.text)
+        ret = RecordParser.parse(r.text)
+        for records in ret:
+            records.domain = domain
+        return ret
+
+    def add_record(self, record, upsert=True):
+        pass
+
+    def update_record(self, record):
+        pass
 
     @staticmethod
     def manage_domain_url(domain):
