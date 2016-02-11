@@ -115,7 +115,7 @@ class Freenom(object):
         try:
             self.update_record(record, records)
         except UpdateError as e:
-            return True
+            return len(e.msgs) == 1
         return False
 
     def contains_domain(self, domain, domains=None):
@@ -153,7 +153,6 @@ class Freenom(object):
             playload[record_id + "[value]"] = str(rec.target)
 
         return bool(self.session.post(url, data=playload))
-
 
     @staticmethod
     def manage_domain_url(domain):
