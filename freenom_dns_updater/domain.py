@@ -38,7 +38,10 @@ class Domain(object):
 
     @staticmethod
     def parse_date(value):
-        return datetime.datetime.strptime(value, '%Y-%m-%d').date()
+        try:
+            return datetime.datetime.strptime(value, '%Y-%m-%d').date()
+        except ValueError:
+            return datetime.datetime.strptime(value, '%d/%m/%Y').date()
 
     def __str__(self, *args, **kwargs):
         return "Domain({.name})".format(self)
