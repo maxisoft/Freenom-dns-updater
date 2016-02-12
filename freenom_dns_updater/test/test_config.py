@@ -61,34 +61,34 @@ class ConfigTest(unittest.TestCase):
 
         domain_1 = Domain("test.tk")
         record_1 = Record(
-            target=str(ipaddress.ip_address("49.20.57.31")),
+            target=str(ipaddress.ip_address(u"49.20.57.31")),
             type=RecordType.A,
             domain=domain_1
         )
 
         record_2 = Record(
-            target=str(ipaddress.ip_address("49.20.57.31")),
+            target=str(ipaddress.ip_address(u"49.20.57.31")),
             type=RecordType.A,
             name='mysubdomain',
             domain=domain_1
         )
 
         record_3 = Record(
-            target=str(ipaddress.ip_address("fd2b:1c1b:3641:1cd8::")),
+            target=str(ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::")),
             type=RecordType.AAAA,
             name='mysubdomain',
             domain=domain_1
         )
 
         record_4 = Record(
-            target=str(ipaddress.ip_address("fd2b:1c1b:3641:1cd8::")),
+            target=str(ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::")),
             type=RecordType.AAAA,
             domain=domain_1
         )
 
         domain_2 = Domain("test2.tk")
         record_5 = Record(
-            target=str(ipaddress.ip_address("fd2b:1c1b:3641:1cd8::")),
+            target=str(ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::")),
             type=RecordType.AAAA,
             domain=domain_2,
             ttl=24440
@@ -96,28 +96,27 @@ class ConfigTest(unittest.TestCase):
 
         record_6 = Record(
             name='mysubdomain',
-            target=str(ipaddress.ip_address("49.20.57.31")),
+            target=str(ipaddress.ip_address(u"49.20.57.31")),
             type=RecordType.A,
             domain=domain_2,
         )
 
         record_7 = Record(
             name='ipv6sub',
-            target=str(ipaddress.ip_address("fd2b:1c1b:3641:1cd8::")),
+            target=str(ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::")),
             type=RecordType.AAAA,
             domain=domain_2,
         )
 
         record_8 = Record(
             name='ipv4sub',
-            target=str(ipaddress.ip_address("64.64.64.64")),
+            target=str(ipaddress.ip_address(u"64.64.64.64")),
             type=RecordType.A,
             domain=domain_2,
         )
 
         self.assertIn(record_1, records)
         self.assertIn(record_2, records)
-        self.assertIn(record_3, records)
         self.assertIn(record_3, records)
         self.assertIn(record_4, records)
         self.assertIn(record_5, records)

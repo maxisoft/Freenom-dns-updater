@@ -5,4 +5,5 @@ six
 pathlib
 enum34
 ipaddress
+click
 HTTPretty

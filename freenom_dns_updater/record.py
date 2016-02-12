@@ -77,6 +77,8 @@ class Record(object):
         return "<{0}({1.name}, {1.type.name})>".format(self.__class__.__name__, self)
 
     def __eq__(self, other):
+        if self is other:
+            return True
         if not isinstance(other, Record):
             return False
         if self.name != other.name:
@@ -90,5 +92,8 @@ class Record(object):
         if self.domain != other.domain:
             return False
         return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 

@@ -93,7 +93,7 @@ class Config(dict):
 
         if target_given and record.target != 'auto':
             try:
-                addr = ipaddress.ip_address(record.target)
+                addr = ipaddress.ip_address(six.u(record.target))
             except ValueError:
                 pass
             else:

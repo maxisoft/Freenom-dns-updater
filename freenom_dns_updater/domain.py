@@ -47,6 +47,8 @@ class Domain(object):
         return "<{}({.id})>".format(self.__class__.__name__, self)
 
     def __eq__(self, other):
+        if self is other:
+            return True
         if not isinstance(other, Domain):
             return False
         if self.id != other.id:
@@ -63,7 +65,5 @@ class Domain(object):
             return False
         return True
 
-
-
-
-
+    def __ne__(self, other):
+        return not self.__eq__(other)
