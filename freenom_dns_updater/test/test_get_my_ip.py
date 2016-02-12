@@ -1,13 +1,52 @@
 import unittest
 import ipaddress
 
+import httpretty
+import json
 import requests.exceptions
 
 from freenom_dns_updater.get_my_ip import *
 
 
-class GetMyIpTest(unittest.TestCase):
+class GetMyIpTestMock(unittest.TestCase):
+    @httpretty.activate
+    def test_get_my_ip(self):
+        httpretty.register_uri(httpretty.GET, "http://test.com/",
+                               body=json.dumps({
+                                   "address": "fd2b:1c1b:3641:1cd8::",
+                                   "proto": "ipv6"}),
+                               content_type='text/json')
 
+        res = get_my_ip('http://test.com/')
+        self.assertIsInstance(res, ipaddress._BaseAddress)
+        self.assertEqual(res, ipaddress.ip_address("fd2b:1c1b:3641:1cd8::"))
+
+    @httpretty.activate
+    def test_get_my_ipv4(self):
+        httpretty.register_uri(httpretty.GET, "http://test.com/",
+                               body=json.dumps({
+                                   "address": "49.20.57.31",
+                                   "proto": "ipv4"}),
+                               content_type='text/json')
+
+        res = get_my_ipv4('http://test.com/')
+        self.assertIsInstance(res, ipaddress.IPv4Address)
+        self.assertEqual(res, ipaddress.ip_address("49.20.57.31"))
+
+    @httpretty.activate
+    def test_get_my_ip(self):
+        httpretty.register_uri(httpretty.GET, "http://test.com/",
+                               body=json.dumps({
+                                   "address": "fd2b:1c1b:3641:1cd8::",
+                                   "proto": "ipv6"}),
+                               content_type='text/json')
+
+        res = get_my_ip('http://test.com/')
+        self.assertIsInstance(res, ipaddress._BaseAddress)
+        self.assertEqual(res, ipaddress.ip_address("fd2b:1c1b:3641:1cd8::"))
+
+
+class GetMyIpTestReal(unittest.TestCase):
     def test_get_my_ip(self):
         res = get_my_ip()
         self.assertIsInstance(res, ipaddress._BaseAddress)
@@ -17,8 +56,12 @@ class GetMyIpTest(unittest.TestCase):
         self.assertIsInstance(res, ipaddress.IPv4Address)
 
     def test_get_my_ipv6(self):
-        res = get_my_ipv6()
-        self.assertIsInstance(res, ipaddress.IPv6Address)
+        try:
+            res = get_my_ipv6()
+        except ConnectionError as e:
+            self.skipTest("host doesn't provide ipv6")
+        else:
+            self.assertIsInstance(res, ipaddress.IPv6Address)
 
     def test_get_my_ip_timeout(self):
         self.assertRaises(requests.exceptions.Timeout, get_my_ip, "https://httpbin.org/delay/10", **{'timeout': 2})

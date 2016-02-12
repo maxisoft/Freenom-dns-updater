@@ -5,3 +5,4 @@ six
 pathlib
 enum34
 ipaddress
+HTTPretty
