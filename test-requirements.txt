@@ -4,3 +4,4 @@ PyYAML
 six
 pathlib
 enum34
+ipaddress

@@ -3,3 +3,4 @@ beautifulsoup4
 PyYAML
 enum34
 six
+ipaddress
