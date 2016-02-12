@@ -4,13 +4,28 @@ import six
 from .domain import Domain
 
 
+@unique
+class RecordType(Enum):
+    A = 1
+    AAAA = 2
+    CNAME = 3
+    LOC = 4
+    MX = 5
+    NAPTR = 6
+    RP = 7
+    TXT = 8
+
+
 class Record(object):
-    def __init__(self):
-        self._name = ''
-        self._type = RecordType.A
-        self._ttl = int(14440)
-        self.target = ''
+    def __init__(self, name='', type=RecordType.A, ttl=14440, target='', domain=None):
+        self._name = name
+        self._type = None
+        self.type = type
+        self._ttl = None
+        self.ttl = ttl
+        self.target = target
         self._domain = None
+        self.domain = domain
 
     @property
     def name(self):
@@ -49,7 +64,7 @@ class Record(object):
 
     @domain.setter
     def domain(self, value):
-        if isinstance(value, Domain):
+        if value is None or isinstance(value, Domain):
             self._domain = value
         else:
             raise ValueError("bad type")
@@ -75,15 +90,4 @@ class Record(object):
             return False
         return True
 
-
-@unique
-class RecordType(Enum):
-    A = 1
-    AAAA = 2
-    CNAME = 3
-    LOC = 4
-    MX = 5
-    NAPTR = 6
-    RP = 7
-    TXT = 8
 
