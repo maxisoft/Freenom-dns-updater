@@ -4,9 +4,9 @@ import ipaddress
 import httpretty
 import json
 import requests.exceptions
+import six
 
 from freenom_dns_updater.get_my_ip import *
-
 
 class GetMyIpTestMock(unittest.TestCase):
     @httpretty.activate
@@ -19,7 +19,7 @@ class GetMyIpTestMock(unittest.TestCase):
 
         res = get_my_ip('http://test.com/')
         self.assertIsInstance(res, ipaddress._BaseAddress)
-        self.assertEqual(res, ipaddress.ip_address("fd2b:1c1b:3641:1cd8::"))
+        self.assertEqual(res, ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::"))
 
     @httpretty.activate
     def test_get_my_ipv4(self):
@@ -31,7 +31,7 @@ class GetMyIpTestMock(unittest.TestCase):
 
         res = get_my_ipv4('http://test.com/')
         self.assertIsInstance(res, ipaddress.IPv4Address)
-        self.assertEqual(res, ipaddress.ip_address("49.20.57.31"))
+        self.assertEqual(res, ipaddress.ip_address(u"49.20.57.31"))
 
     @httpretty.activate
     def test_get_my_ip(self):
@@ -43,7 +43,7 @@ class GetMyIpTestMock(unittest.TestCase):
 
         res = get_my_ip('http://test.com/')
         self.assertIsInstance(res, ipaddress._BaseAddress)
-        self.assertEqual(res, ipaddress.ip_address("fd2b:1c1b:3641:1cd8::"))
+        self.assertEqual(res, ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::"))
 
 
 class GetMyIpTestReal(unittest.TestCase):
@@ -58,7 +58,7 @@ class GetMyIpTestReal(unittest.TestCase):
     def test_get_my_ipv6(self):
         try:
             res = get_my_ipv6()
-        except ConnectionError as e:
+        except OSError as e:
             self.skipTest("host doesn't provide ipv6")
         else:
             self.assertIsInstance(res, ipaddress.IPv6Address)
