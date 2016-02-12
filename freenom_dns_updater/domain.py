@@ -2,8 +2,8 @@ import datetime
 
 
 class Domain(object):
-    def __init__(self):
-        self.name = ""
+    def __init__(self, name=""):
+        self.name = name
         self._register_date = datetime.date.today()
         self._expire_date = datetime.date.today()
         self.state = ""

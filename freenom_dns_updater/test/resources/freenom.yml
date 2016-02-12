@@ -1,0 +1,37 @@
+login: yourlogin@somemail.domain
+password: yourpassword
+
+# list here the records you want to add/update
+record:
+  # the following will update both the A and AAAA records with your current ips (v4 and v6).
+  # If you don't have an ipv6 connection, the program 'll detect it and will only update the A record (ipv4)
+  - domain: test.tk
+
+  # the following will update both your subdomain's A and AAAA records with your current ips (v4 and v6)
+  - domain: test.tk
+    name: mysubdomain
+
+  # here's more advanced exemples
+
+  # the following will update the AAAA record with a specified ipv6
+  - domain: test2.tk
+    name: # you can omit this line
+    type: AAAA
+    target: "fd2b:1c1b:3641:1cd8::" # note that you has to quote ipv6 addresses
+    ttl: 24440
+
+  # the following will update the your subdomain's A record with your current ip (v4)
+  - domain: test2.tk
+    name: mysubdomain
+    type: A
+    target: auto # you can omit this line
+
+
+  # you can omit the record type and give only ipv4 or ipv6 addresses.
+  - domain: test2.tk
+    name: ipv6sub
+    target: "fd2b:1c1b:3641:1cd8::"
+
+  - domain: test2.tk
+    name: ipv4sub
+    target: "64.64.64.64"

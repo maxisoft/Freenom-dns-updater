@@ -18,13 +18,14 @@ class RecordType(Enum):
 
 class Record(object):
     def __init__(self, name='', type=RecordType.A, ttl=14440, target='', domain=None):
-        self._name = name
+        self._name = None
         self._type = None
-        self.type = type
         self._ttl = None
+        self._domain = None
+        self.name = name
+        self.type = type
         self.ttl = ttl
         self.target = target
-        self._domain = None
         self.domain = domain
 
     @property

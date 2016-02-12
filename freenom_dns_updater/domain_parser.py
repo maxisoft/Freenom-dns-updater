@@ -18,7 +18,7 @@ class DomainParser(object):
         for raw_domain in raw_domains:
             props = raw_domain.find_all("td")
             domain = Domain()
-            domain.name = props[0].text.strip()
+            domain.name = props[0].text.strip().lower()
             domain.register_date = props[1].text
             domain.expire_date = props[2].text
             domain.state = props[3].text

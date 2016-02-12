@@ -70,9 +70,9 @@ class GetMyIpTestReal(unittest.TestCase):
         try:
             res = get_my_ipv6()
         except OSError:
-            self.skipTest("host doesn't provide ipv6")
+            self.skipTest("localhost doesn't provide ipv6")
         except requests.exceptions.ConnectionError:
-            self.skipTest("host doesn't provide ipv6")
+            self.skipTest("localhost doesn't provide ipv6")
         else:
             self.assertIsInstance(res, ipaddress.IPv6Address)
 
