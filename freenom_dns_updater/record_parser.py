@@ -6,6 +6,8 @@ from .record import Record, RecordType
 class RecordParser(object):
     @classmethod
     def parse(cls, raw_html):
+        if "No records to display." in raw_html:
+            return []
         soup = BeautifulSoup(raw_html, "html.parser")
         tag = soup.find("input", {'name': 'dnsaction', 'value': 'modify'})
         assert tag, "can't parse the given html"
