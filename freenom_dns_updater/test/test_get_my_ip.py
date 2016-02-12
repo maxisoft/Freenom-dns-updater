@@ -20,7 +20,17 @@ class GetMyIpTestMock(unittest.TestCase):
 
         res = get_my_ip('http://test.com/')
         self.assertIsInstance(res, ipaddress._BaseAddress)
-        self.assertEqual(res, ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::"))
+        self.assertEqual(ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::"), res)
+
+        httpretty.register_uri(httpretty.GET, "http://test.com/",
+                               body=json.dumps({
+                                   "address": "49.20.57.31",
+                                   "proto": "ipv4"}),
+                               content_type='text/json')
+
+        res = get_my_ip('http://test.com/')
+        self.assertIsInstance(res, ipaddress._BaseAddress)
+        self.assertEqual(ipaddress.ip_address(u"49.20.57.31"), res)
 
     @httpretty.activate
     def test_get_my_ipv4(self):
@@ -32,7 +42,7 @@ class GetMyIpTestMock(unittest.TestCase):
 
         res = get_my_ipv4('http://test.com/')
         self.assertIsInstance(res, ipaddress.IPv4Address)
-        self.assertEqual(res, ipaddress.ip_address(u"49.20.57.31"))
+        self.assertEqual(ipaddress.ip_address(u"49.20.57.31"), res)
 
     @httpretty.activate
     def test_get_my_ip(self):
@@ -44,7 +54,7 @@ class GetMyIpTestMock(unittest.TestCase):
 
         res = get_my_ip('http://test.com/')
         self.assertIsInstance(res, ipaddress._BaseAddress)
-        self.assertEqual(res, ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::"))
+        self.assertEqual(ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::"), res)
 
 
 class GetMyIpTestReal(unittest.TestCase):
