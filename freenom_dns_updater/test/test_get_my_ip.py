@@ -8,6 +8,7 @@ import six
 
 from freenom_dns_updater.get_my_ip import *
 
+
 class GetMyIpTestMock(unittest.TestCase):
     @httpretty.activate
     def test_get_my_ip(self):
@@ -58,7 +59,9 @@ class GetMyIpTestReal(unittest.TestCase):
     def test_get_my_ipv6(self):
         try:
             res = get_my_ipv6()
-        except OSError as e:
+        except OSError:
+            self.skipTest("host doesn't provide ipv6")
+        except requests.exceptions.ConnectionError:
             self.skipTest("host doesn't provide ipv6")
         else:
             self.assertIsInstance(res, ipaddress.IPv6Address)
