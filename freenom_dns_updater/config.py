@@ -66,7 +66,7 @@ class Config(dict):
             except:
                 ipv6 = None
         for rec in records:
-            ret += self._parse_record(rec, str(ipv4), str(ipv6))
+            ret += self._parse_record(rec, str(ipv4), str(ipv6) if ipv6 else None)
         self._records = ret
         return ret
 
