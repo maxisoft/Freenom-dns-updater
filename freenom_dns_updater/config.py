@@ -1,3 +1,5 @@
+import pathlib
+
 import yaml
 import six
 import ipaddress
@@ -12,8 +14,10 @@ from .get_my_ip import *
 class Config(dict):
     def __init__(self, file="freenom.yml", **kwargs):
         super(Config, self).__init__(**kwargs)
-        self.file = file
+        if isinstance(file, pathlib.Path):
+            file = str(file)
         self.reload(file)
+        self.file = file
         self._records = None
 
     def reload(self, file):
@@ -27,8 +31,11 @@ class Config(dict):
         self._records = None
 
     def save(self):
-        with open(self.file, 'w') as f:
-            yaml.dump(self, f)
+        if isinstance(self.file, six.string_types):
+            with open(self.file, 'w') as f:
+                yaml.dump(self, f)
+            return True
+        return False
 
     @property
     def login(self):
