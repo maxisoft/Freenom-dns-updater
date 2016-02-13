@@ -12,27 +12,30 @@ from .get_my_ip import *
 
 
 class Config(dict):
-    def __init__(self, file="freenom.yml", **kwargs):
+    def __init__(self, src="freenom.yml", **kwargs):
         super(Config, self).__init__(**kwargs)
-        if isinstance(file, pathlib.Path):
-            file = str(file)
-        self.reload(file)
-        self.file = file
+        if isinstance(src, pathlib.Path):
+            src = str(src)
+        self.reload(src)
+        self.file = src
         self._records = None
 
-    def reload(self, file):
-        if hasattr(file, 'read'):
-            content = yaml.load(file)
+    def reload(self, src):
+        if isinstance(src, dict):
+            content = src
+        elif hasattr(src, 'read'):
+            content = yaml.load(src)
         else:
-            with open(file) as f:
+            with open(src) as f:
                 content = yaml.load(f)
         self.clear()
         self.update(content)
         self._records = None
 
-    def save(self):
-        if isinstance(self.file, six.string_types):
-            with open(self.file, 'w') as f:
+    def save(self, file=None):
+        file = file or self.file
+        if isinstance(file, six.string_types):
+            with open(file, 'w') as f:
                 yaml.dump(self, f)
             return True
         return False
