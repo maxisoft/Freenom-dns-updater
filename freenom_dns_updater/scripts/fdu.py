@@ -120,7 +120,7 @@ def add(user, password, domain, name, type, target, ttl, update):
     if ok_count:
         click.echo('Record successfully added{}.'.format("/updated" if update else ""))
     else:
-        click.secho('no record updated', fg='yellow', bold=True)
+        click.secho('No record updated', fg='yellow', bold=True)
 
 
 @record.command(help='Update a record')
@@ -151,7 +151,7 @@ def update(user, password, domain, name, type, target, ttl, update):
     if ok_count:
         click.echo('Record successfully added{}.'.format("/updated" if update else ""))
     else:
-        click.secho('no record updated', fg='yellow', bold=True)
+        click.secho('No record updated', fg='yellow', bold=True)
 
 
 @record.command(help='Remove a record from a specified domain')
@@ -183,7 +183,7 @@ def rm(user, password, domain, name, type, target, ttl, update):
     if ok_count:
         click.echo('Record successfully removed.')
     else:
-        click.secho('no record removed', fg='yellow', bold=True)
+        click.secho('No record removed', fg='yellow', bold=True)
 
 
 @cli.command(help='''Update records according to a configuration file''')
@@ -209,7 +209,7 @@ def update(config, ignore_errors):
         else:
             click.echo('Updated {} record{}'.format(ok_count, "s" if ok_count > 1 else ""))
     else:
-        click.secho('no record updated', fg='yellow', bold=True)
+        click.secho('No record updated', fg='yellow', bold=True)
 
 
 def record_action(action, config, ignore_errors):
@@ -228,7 +228,7 @@ def record_action(action, config, ignore_errors):
         domain_name = rec.domain.name
         rec.domain = domains_mapping.get(domain_name)
         if rec.domain is None:
-            click.secho("you don't own the domain \"{}\"".format(domain_name), fg='yellow', bold=True)
+            click.secho("You don't own the domain \"{}\"".format(domain_name), fg='yellow', bold=True)
             if ignore_errors:
                 continue
             else:
