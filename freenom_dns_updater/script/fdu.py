@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import click
 import pathlib
+
+import datetime
+
 import freenom_dns_updater
 import sys
 import six
@@ -17,7 +20,6 @@ if six.PY2:
 else:
     from urllib.parse import urlparse
 
-
 _format_map = {
     None: lambda x: x,
     'TEXT': lambda x: pprint.pformat(x),
@@ -30,11 +32,19 @@ def format_data(data, formater='TEXT'):
     if isinstance(data, (list, tuple, set)):
         data = [format_data(x, None) for x in data]
     elif isinstance(data, dict):
-        data = {format_data(k, None): format_data(v, None) for k,v in six.iteritems(data)}
+        data = {format_data(k, None): format_data(v, None) for k, v in six.iteritems(data)}
+    elif isinstance(data, freenom_dns_updater.Domain):
+        data = format_data({'name': data.name, 'state': data.state,
+                            'type': data.type, 'id': data.id,
+                            'register': data.register_date,
+                            'expire': data.expire_date}, None)
     elif isinstance(data, freenom_dns_updater.Record):
-        return {'name': data.name, 'type': data.type.name,
-                'ttl': data.ttl, 'target': data.target}
+        data = format_data({'name': data.name, 'type': data.type.name,
+                            'ttl': data.ttl, 'target': data.target}, None)
+    elif isinstance(data, datetime.date):
+        data = str(data)
     return _format_map[formater](data)
+
 
 click_record_type = click.Choice([t.name for t in freenom_dns_updater.RecordType])
 
@@ -49,6 +59,12 @@ def cli():
 @cli.group(help='''Manage records''')
 @click.help_option('--help', '-h')
 def record():
+    pass
+
+
+@cli.group(help='''Manage domain''')
+@click.help_option('--help', '-h')
+def domain():
     pass
 
 
@@ -72,7 +88,7 @@ def ls(user, password, domain, format):
         click.secho("You don't own the domain \"{}\"".format(domain), fg='yellow', bold=True)
         sys.exit(7)
     records = freenom.list_records(domain)
-    print(format_data(records, format))
+    click.echo(format_data(records, format))
 
 
 @record.command(help='Add a record into a specified domain')
@@ -229,6 +245,20 @@ def record_action(action, config, ignore_errors):
     return ok_count, err_count
 
 
+@domain.command(help='List domains')
+@click.argument('user')
+@click.argument('password')
+@click.option('-f', '--format', help='Output format', default='TEXT', type=click.Choice(("TEXT", "JSON", "YAML")))
+@click.help_option('--help', '-h')
+def ls(user, password, format):
+    freenom = freenom_dns_updater.Freenom()
+    if not freenom.login(user, password):
+        click.secho('Unable to login with the given credential', fg='red', bold=True)
+        sys.exit(6)
+    # search the domain
+    domains = freenom.list_domains()
+    click.echo(format_data(domains, format))
+
+
 if __name__ == '__main__':
     cli()
-

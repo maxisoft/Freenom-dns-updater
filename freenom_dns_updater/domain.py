@@ -19,7 +19,7 @@ class Domain(object):
         if isinstance(value, datetime.date):
             self._register_date = value
         elif isinstance(value, datetime.datetime):
-            self.register_date = value.date()
+            self._register_date = value.date()
         else:
             self.register_date = self.parse_date(value)
 
