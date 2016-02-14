@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 import pathlib
 
-
-
 def gen():
     base_path = pathlib.Path(__file__).parent
     armhf_path = base_path / 'armhf'
     armhf_path.mkdir(exist_ok=True)
     with (armhf_path / 'Dockerfile').open('w') as out:
         for line in (base_path / 'Dockerfile').open():
-            line = line.replace('frolvlad/alpine-python3', 'container4armhf/armhf-alpine:3.3')
+            line = line.replace('frolvlad/alpine-python3', 'multiarch/alpine:armhf-v3.3')
             if line.startswith('#') and 'Placeholder for armhf' in line:
                 out.write('''RUN apk add --no-cache python3 && \\
     apk add --no-cache --virtual=build-dependencies wget ca-certificates && \\

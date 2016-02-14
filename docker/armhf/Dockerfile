@@ -1,4 +1,4 @@
-FROM container4armhf/armhf-alpine:3.3
+FROM multiarch/alpine:armhf-v3.3
 MAINTAINER maxisoft
 LABEL Description="This image is used to start freenom dns updater" Version="1.0"
 
