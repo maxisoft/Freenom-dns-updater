@@ -10,4 +10,4 @@ RUN unzip fdu.zip \
 	&& pip3 install ./Freenom-dns-updater-master \
 	&& rm -rf Freenom-dns-updater-master
 
-CMD fdu update /freenom.yml
+CMD fdu process /etc/freenom.yml
