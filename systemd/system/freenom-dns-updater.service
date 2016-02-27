@@ -4,7 +4,7 @@ Wants=network.target network-online.target
 After=network.target network-online.target
 
 [Service]
-ExecStart=/usr/bin/fdu process
+ExecStart=/usr/bin/fdu process -c -i /etc/freenom.yml
 
 [Install]
 WantedBy=multi-user.target
