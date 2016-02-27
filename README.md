@@ -5,11 +5,11 @@ A tool written in python to update [freenom](http://Freenom.com)'s dns records
 [![PyPI Version](https://img.shields.io/pypi/v/freenom-dns-updater.svg)](https://pypi.python.org/pypi/freenom-dns-updater)
 [![PyPI](https://img.shields.io/pypi/l/freenom-dns-updater.svg)](https://pypi.python.org/pypi/freenom-dns-updater)
 
-# Main Features
+## Main Features
 * Manage (add/update/remove) a domain's dns record with cli
 * Automatic records updates according to ip (v4/v6) changes 
 
-# Upcoming features
+## Upcoming features
 * Auto renew domains
 
 ## Installation
@@ -77,17 +77,17 @@ record:
     target: "64.64.64.64"
 ```
 
-In order to use such configuration, you can use the following :
+In order to use such configuration, you can use the following command :
 ```bash
 fdu update /path/to/config
 ```
 
-Where /path/to/config can be either: 
+Where */path/to/config* can be either: 
 - A path to a file (default location is ```/etc/freenom.yml```)
 - A http url (a raw secret [gist](https://gist.githubusercontent.com/maxisoft/1b979b64e4cf5157d58d/raw/freenom.yml) for instance)
 
 ## Schedule
-In order to launch regularly an update, you can launch the tool with 
+In order to launch regularly an update, you can launch the tool with :
 ```bash
 fdu process -c -i -t 3600 /path/to/config
 ```
