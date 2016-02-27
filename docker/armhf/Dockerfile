@@ -7,10 +7,6 @@ RUN apk add --no-cache python3 && \
     wget "https://bootstrap.pypa.io/get-pip.py" -O /dev/stdout | python3 && \
     apk del build-dependencies
 
-ADD https://github.com/maxisoft/Freenom-dns-updater/archive/master.zip fdu.zip
-RUN unzip fdu.zip \
-	&& rm fdu.zip \
-	&& pip3 install ./Freenom-dns-updater-master \
-	&& rm -rf Freenom-dns-updater-master
+RUN pip3 install freenom-dns-updater
 
 CMD fdu process /etc/freenom.yml
