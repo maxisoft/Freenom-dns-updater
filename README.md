@@ -19,15 +19,15 @@ pip install freenom-dns-updater
 ## Usage
 
 ### Basic usage
-Let's say you want to add/update your main A/AAAA domain records *exemple.tk* with your current ip (v4/v6).
+Let's say you want to add or update your main A/AAAA domain records *exemple.tk* with your current ip (v4/v6).
 Simply type : 
 ```
 fdu record update $LOGIN $PASSWORD exemple.tk
 ```
 
-Note that if you don't have an ipv6 access, the tool'll detect that and will update only the A record (ipv4) of *exemple.tk*.
+Note that if you don't have an ipv6 access, the tool will detect that and will update only the A record (ipv4) of *exemple.tk*.
 
-In order to add/update the subdomain *sub.exemple.tk*:
+In order to add or update the subdomain *sub.exemple.tk*:
 ```
 fdu record update $LOGIN $PASSWORD exemple.tk -n sub
 ```
@@ -60,7 +60,7 @@ record:
     target: "fd2b:1c1b:3641:1cd8::" # note that you has to quote ipv6 addresses
     ttl: 24440
 
-  # the following will update the your subdomain's A record with your current ip (v4)
+  # the following will update your subdomain's A record with your current ip (v4)
   - domain: test2.tk
     name: mysubdomain
     type: A
@@ -86,12 +86,43 @@ Where /path/to/config can be either:
 - A path to a file (default location is ```/etc/freenom.yml```)
 - A http url (a raw secret [gist](https://gist.githubusercontent.com/maxisoft/1b979b64e4cf5157d58d/raw/freenom.yml) for instance)
 
+## Schedule
+In order to launch regularly an update, you can launch the tool with 
+```bash
+fdu process -c -i -t 3600 /path/to/config
+```
+Where the params are :  
+
+| param           | description                                          |
+|-----------------|------------------------------------------------------|
+| -c              | cache the ip and update only if there is any changes |
+| -i              | ignore errors when updating                          |
+| -t              | time (in second) to wait between two updates         |
+| /path/to/config | a path or a url to a configuration file              |
+
+
+
+### Using systemd
+For ease of use a systemd unit file is available along the source code.
+- Save your configuration into ```/etc/freenom.yml```
+- Copy the ```systemd/system/freenom-dns-updater.service``` into a valid systemd unit folder (```/usr/lib/systemd/system/``` for instance).  
+- finally enable the service using 
+```
+systemctl enable freenom-dns-updater
+systemctl start freenom-dns-updater
+```
+
+
+### Using other Os / services manager
+There's two straightforward choices :  
+- Launch the previous ```fdu process``` command 
+- Schedule using cron, windows' scheduled task, ... the ```fdu update``` command
 
 
 ## Docker image
 [![Docker layers](https://badge.imagelayers.io/maxisoft/freenom-dns-updater:latest.svg)](https://imagelayers.io/?images=maxisoft/freenom-dns-updater:latest)
 
-If you want to run this in an isolated environment there's a docker image available at 
+If you want to run this tool in an isolated environment there's a docker image available at 
 [maxisoft/freenom-dns-updater](https://hub.docker.com/r/maxisoft/freenom-dns-updater/)
 
 ### for armhf
