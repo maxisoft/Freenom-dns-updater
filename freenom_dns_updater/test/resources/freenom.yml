@@ -4,7 +4,7 @@ password: yourpassword
 # list here the records you want to add/update
 record:
   # the following will update both the A and AAAA records with your current ips (v4 and v6).
-  # If you don't have an ipv6 connection, the program 'll detect it and will only update the A record (ipv4)
+  # If you don't have an ipv6 connection, the program'll detect it and will only update the A record (ipv4)
   - domain: test.tk
 
   # the following will update both your subdomain's A and AAAA records with your current ips (v4 and v6)
