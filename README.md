@@ -1,5 +1,5 @@
 # Freenom dns updater
-A tool to update [freenom](http://Freenom.com)'s dns records
+A tool written in python to update [freenom](http://Freenom.com)'s dns records
 
 [![Build Status](https://travis-ci.org/maxisoft/Freenom-dns-updater.svg?branch=master)](https://travis-ci.org/maxisoft/Freenom-dns-updater)
 [![PyPI Version](https://img.shields.io/pypi/v/freenom-dns-updater.svg)](https://pypi.python.org/pypi/freenom-dns-updater)
