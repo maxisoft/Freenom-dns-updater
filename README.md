@@ -18,19 +18,25 @@ pip install freenom-dns-updater
 ```
 ## Usage
 
-### basic usage
-Let's say you want to update your main A/AAAA domain records *exemple.tk* with your current ip (v4/v6).
-Simply type
+### Basic usage
+Let's say you want to add/update your main A/AAAA domain records *exemple.tk* with your current ip (v4/v6).
+Simply type : 
 ```
-fdu record add $LOGIN $PASSWORD exemple.tk
+fdu record update $LOGIN $PASSWORD exemple.tk
 ```
 
 Note that if you don't have an ipv6 access, the tool'll detect that and will update only the A record (ipv4) of *exemple.tk*.
 
-### advanced usage
+In order to add/update the subdomain *sub.exemple.tk*:
+```
+fdu record update $LOGIN $PASSWORD exemple.tk -n sub
+```
+
+
+### Advanced usage
 If you want to update multiple (sub)domains you could call the tool for each domains.
-But you should create a configuration file.  
-A configuration is a [YAML](https://en.wikipedia.org/wiki/YAML) file, something like :
+Even better, you can create a configuration file.  
+A configuration is a [YAML](https://en.wikipedia.org/wiki/YAML) file, which look like :
 ```YAML
 login: yourlogin@somemail.domain
 password: yourpassword
