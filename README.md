@@ -57,7 +57,7 @@ record:
   - domain: test2.tk
     name: # you can omit this line
     type: AAAA
-    target: "fd2b:1c1b:3641:1cd8::" # note that you has to quote ipv6 addresses
+    target: "fd2b:1c1b:3641:1cd8::" # note that you have to quote ipv6 addresses
     ttl: 24440
 
   # the following will update your subdomain's A record with your current ip (v4)
@@ -116,7 +116,7 @@ systemctl start freenom-dns-updater
 ### Using other Os / services manager
 There's two straightforward choices :  
 - Launch the previous ```fdu process``` command 
-- Schedule using cron, windows' scheduled task, ... the ```fdu update``` command
+- Schedule the ```fdu update``` command using cron, windows' scheduled task, ...
 
 
 ## Docker image
@@ -124,6 +124,19 @@ There's two straightforward choices :
 
 If you want to run this tool in an isolated environment there's a docker image available at 
 [maxisoft/freenom-dns-updater](https://hub.docker.com/r/maxisoft/freenom-dns-updater/)
+
+## Ipv6
+Note that if you want to use the ipv6 functionality, you have to enable the [docker ipv6 stack](https://docs.docker.com/v1.5/articles/networking/#ipv6) 
+
+### examples
+- Update dns records using a gist config file :
+```bash
+docker run -it --rm maxisoft/freenom-dns-updater-armhf fdu update https://gist.githubusercontent.com/maxisoft/1b979b64e4cf5157d58d/raw/freenom.yml
+```
+- Run the tool in a background docker with a local config file :  
+```bash
+docker run -d --rm -v /path/to/config:/etc/freenom.yml maxisoft/freenom-dns-updater-armhf
+```
 
 ### for armhf
 There's also an image for armhf (raspberry pi for instance) available at 
