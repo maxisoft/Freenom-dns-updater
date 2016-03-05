@@ -1,4 +1,4 @@
-FROM frolvlad/alpine-python3
+FROM python:3-alpine
 MAINTAINER maxisoft
 LABEL Description="This image is used to start freenom dns updater" Version="1.0"
 
