@@ -25,7 +25,7 @@ Simply type :
 fdu record update $LOGIN $PASSWORD exemple.tk
 ```
 
-Note that if you don't have an ipv6 access, the tool will detect that and will update only the A record (ipv4) of *exemple.tk*.
+Note that if you don't have a ipv6 access, the tool will detect that and will update only the A record (ipv4) of *exemple.tk*.
 
 In order to add or update the subdomain *sub.exemple.tk*:
 ```
@@ -44,7 +44,7 @@ password: yourpassword
 # list here the records you want to add/update
 record:
   # the following will update both the A and AAAA records with your current ips (v4 and v6).
-  # If you don't have an ipv6 connection, the program'll detect it and will only update the A record (ipv4)
+  # Note that if you don't have a ipv6 connection, the program'll detect it and will only update the A record (ipv4)
   - domain: test.tk
 
   # the following will update both your subdomain's A and AAAA records with your current ips (v4 and v6)
@@ -125,10 +125,10 @@ There's two straightforward choices :
 If you want to run this tool in an isolated environment there's a docker image available at 
 [maxisoft/freenom-dns-updater](https://hub.docker.com/r/maxisoft/freenom-dns-updater/)
 
-## Ipv6
+### Ipv6
 Note that if you want to use the ipv6 functionality, you have to enable the [docker ipv6 stack](https://docs.docker.com/v1.5/articles/networking/#ipv6) 
 
-### examples
+### Examples
 - Update dns records using a gist config file :
 ```bash
 docker run -it --rm maxisoft/freenom-dns-updater-armhf fdu update https://gist.githubusercontent.com/maxisoft/1b979b64e4cf5157d58d/raw/freenom.yml
@@ -138,6 +138,6 @@ docker run -it --rm maxisoft/freenom-dns-updater-armhf fdu update https://gist.g
 docker run -d --rm -v /path/to/config:/etc/freenom.yml maxisoft/freenom-dns-updater-armhf
 ```
 
-### for armhf
+### For armhf
 There's also an image for armhf (raspberry pi for instance) available at 
 [maxisoft/freenom-dns-updater-armhf](https://hub.docker.com/r/maxisoft/freenom-dns-updater-armhf)
