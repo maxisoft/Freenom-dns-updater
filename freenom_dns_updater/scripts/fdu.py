@@ -107,8 +107,9 @@ def record_ls(user, password, domain, format):
 @click.option('-a', '--target', help='Record target. An ip address for A record')
 @click.option('-l', '--ttl', help='Record time to live.', type=click.INT)
 @click.option('-u', '--update', help='Update existing record', default=True, type=click.BOOL)
+@click.option('-f', '--force', help='Force adding record', default=True, type=click.BOOL)
 @click.help_option('--help', '-h')
-def record_add(user, password, domain, name, type, target, ttl, update):
+def record_add(user, password, domain, name, type, target, ttl, update, force):
     d = {'login': user, 'password': password, 'record': []}
     record = {'domain': domain}
     if name:
@@ -122,7 +123,8 @@ def record_add(user, password, domain, name, type, target, ttl, update):
     d['record'].append(record)
     config = freenom_dns_updater.Config(d)
 
-    ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, update), config, False)
+    ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, update, force=force), config,
+                                        False)
 
     if ok_count:
         click.echo('Record successfully added{}.'.format("/updated" if update else ""))
@@ -138,8 +140,9 @@ def record_add(user, password, domain, name, type, target, ttl, update):
 @click.option('-t', '--type', help='Record type. A or AAAA for instance', type=click_record_type)
 @click.option('-a', '--target', help='Record target. An ip address for A records')
 @click.option('-l', '--ttl', help='Record time to live.', type=click.INT)
+@click.option('-i', '--index', help='Record Round Robin index.', type=click.INT)
 @click.help_option('--help', '-h')
-def record_update(user, password, domain, name, type, target, ttl, update):
+def record_update(user, password, domain, name, type, target, ttl, index):
     d = {'login': user, 'password': password, 'record': []}
     record = {'domain': domain}
     if name:
@@ -150,6 +153,8 @@ def record_update(user, password, domain, name, type, target, ttl, update):
         record['target'] = target
     if ttl:
         record['ttl'] = ttl
+    if index:
+        record['index'] = index
     d['record'].append(record)
     config = freenom_dns_updater.Config(d)
 
@@ -169,9 +174,9 @@ def record_update(user, password, domain, name, type, target, ttl, update):
 @click.option('-t', '--type', help='Record type. A or AAAA for instance', type=click_record_type)
 @click.option('-a', '--target', help='Record target. An ip address for A record')
 @click.option('-l', '--ttl', help='Record time to live.', type=click.INT)
-@click.option('-u', '--update', help='Update existing record', default=True, type=click.BOOL)
+@click.option('-i', '--index', help='Record Round Robin index.', type=click.INT)
 @click.help_option('--help', '-h')
-def record_rm(user, password, domain, name, type, target, ttl, update):
+def record_rm(user, password, domain, name, type, target, ttl, index):
     d = {'login': user, 'password': password, 'record': []}
     record = {'domain': domain}
     if name:
@@ -182,6 +187,8 @@ def record_rm(user, password, domain, name, type, target, ttl, update):
         record['target'] = target
     if ttl:
         record['ttl'] = ttl
+    if index:
+        record['index'] = index
     d['record'].append(record)
     config = freenom_dns_updater.Config(d)
 

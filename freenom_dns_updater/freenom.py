@@ -115,7 +115,7 @@ class Freenom(object):
         try:
             self.update_record(record, records)
         except UpdateError as e:
-            return len(e.msgs) > 1
+            return len(e.msgs) > 0
         return False
 
     def contains_domain(self, domain, domains=None):
