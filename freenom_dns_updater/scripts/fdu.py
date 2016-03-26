@@ -107,7 +107,7 @@ def record_ls(user, password, domain, format):
 @click.option('-a', '--target', help='Record target. An ip address for A record')
 @click.option('-l', '--ttl', help='Record time to live.', type=click.INT)
 @click.option('-u', '--update', help='Update existing record', default=True, type=click.BOOL)
-@click.option('-f', '--force', help='Force adding record', default=True, type=click.BOOL)
+@click.option('-f', '--force', help='Force adding record', default=False, type=click.BOOL)
 @click.help_option('--help', '-h')
 def record_add(user, password, domain, name, type, target, ttl, update, force):
     d = {'login': user, 'password': password, 'record': []}
