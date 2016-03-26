@@ -1,15 +1,13 @@
-import re
-
-import requests
-from bs4 import BeautifulSoup, Tag
 from copy import copy
 
-from .record import Record
-from .domain import Domain
-from .exception import UpdateError, AddError, DnsRecordBaseException
-from .domain_parser import DomainParser
-from .record_parser import RecordParser
+import requests
+from bs4 import BeautifulSoup
 
+from .domain import Domain
+from .domain_parser import DomainParser
+from .exception import UpdateError, AddError
+from .record import Record
+from .record_parser import RecordParser
 
 default_user_agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"
 
@@ -45,11 +43,10 @@ class Freenom(object):
             records.domain = domain
         return ret
 
-    def add_record(self, record, upsert=True, records=None):
+    def add_record(self, record, upsert=True, records=None, force=False):
         if records is None:
             records = self.list_records(record.domain)
-        contains_record = self.contains_record(record, records)
-        if contains_record:
+        if not force and self.contains_record(record, records):
             if upsert:
                 return self.update_record(record, records=records)
             else:
@@ -88,10 +85,13 @@ class Freenom(object):
 
         if records is None:
             records = self.list_records(record.domain)
+        counter = 0
         for i, rec in enumerate(records):
             record_id = "records[%d]" % i
             if rec.name == record.name and rec.type == record.type:
-                rec = record
+                counter += 1
+                if record.index is None or record.index == counter:
+                    rec = record
             playload[record_id + "[line]"] = ""
             playload[record_id + "[type]"] = rec.type.name
             playload[record_id + "[name]"] = str(rec.name)
@@ -115,7 +115,7 @@ class Freenom(object):
         try:
             self.update_record(record, records)
         except UpdateError as e:
-            return len(e.msgs) == 1
+            return len(e.msgs) > 1
         return False
 
     def contains_domain(self, domain, domains=None):
