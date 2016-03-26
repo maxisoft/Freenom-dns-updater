@@ -1,14 +1,13 @@
-import pathlib
-
-import yaml
-import six
 import ipaddress
-
-from .record import Record, RecordType
-from .domain import Domain
+import pathlib
 from copy import copy
 
+import six
+import yaml
+
+from .domain import Domain
 from .get_my_ip import *
+from .record import Record, RecordType
 
 
 class Config(dict):
@@ -100,6 +99,9 @@ class Config(dict):
 
         if 'ttl' in raw_record:
             record.ttl = raw_record['ttl']
+
+        if 'index' in raw_record:
+            record.index = raw_record['index']
 
         if target_given and record.target != 'auto':
             try:
