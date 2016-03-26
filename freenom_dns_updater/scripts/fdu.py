@@ -57,7 +57,7 @@ click_record_type = click.Choice([t.name for t in freenom_dns_updater.RecordType
 
 
 @click.group()
-@click.version_option('1.0')
+@click.version_option('1.1')
 @click.help_option('--help', '-h')
 def cli():
     pass
