@@ -1,15 +1,14 @@
-import re
-
-import requests
-from bs4 import BeautifulSoup, Tag
+import datetime
 from copy import copy
 
-from .record import Record
-from .domain import Domain
-from .exception import UpdateError, AddError, DnsRecordBaseException
-from .domain_parser import DomainParser
-from .record_parser import RecordParser
+import requests
+from bs4 import BeautifulSoup
 
+from .domain import Domain
+from .domain_parser import DomainParser
+from .exception import UpdateError, AddError
+from .record import Record
+from .record_parser import RecordParser
 
 default_user_agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"
 
@@ -157,6 +156,12 @@ class Freenom(object):
     @staticmethod
     def manage_domain_url(domain):
         return "https://my.freenom.com/clientarea.php?managedns={0.name}&domainid={0.id}".format(domain)
+
+    def renew(self, domain):
+        if domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=13):
+            r = self.session.get("https://my.freenom.com/domains.php?a=renewdomain&domain={0.id}".format(domain))
+            return bool(r)
+        return False
 
     def is_logged_in(self, r=None, url="https://my.freenom.com/clientarea.php"):
         if r is None:
