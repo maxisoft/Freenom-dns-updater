@@ -107,9 +107,9 @@ def record_ls(user, password, domain, format):
 @click.option('-a', '--target', help='Record target. An ip address for A record')
 @click.option('-l', '--ttl', help='Record time to live.', type=click.INT)
 @click.option('-u', '--update', help='Update existing record', default=True, type=click.BOOL)
-@click.option('-f', '--force', help='Force adding record', default=False, type=click.BOOL)
+@click.option('-r', '--round-robin', help='Add a round robin record', is_flag=True)
 @click.help_option('--help', '-h')
-def record_add(user, password, domain, name, type, target, ttl, update, force):
+def record_add(user, password, domain, name, type, target, ttl, update, round_robin):
     d = {'login': user, 'password': password, 'record': []}
     record = {'domain': domain}
     if name:
@@ -123,7 +123,7 @@ def record_add(user, password, domain, name, type, target, ttl, update, force):
     d['record'].append(record)
     config = freenom_dns_updater.Config(d)
 
-    ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, update, force=force), config,
+    ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, update, force=round_robin), config,
                                         False)
 
     if ok_count:
