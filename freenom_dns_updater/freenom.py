@@ -162,7 +162,7 @@ class Freenom(object):
         if r is None:
             r = self.session.get(url)
             assert r, "couldn't get %s" % url
-        return '<li class="addFunds">' in r.text
+        return '<section class="greeting">' in r.text
 
     def _get_login_token(self, url="https://my.freenom.com/clientarea.php"):
         return self._get_token(url)
