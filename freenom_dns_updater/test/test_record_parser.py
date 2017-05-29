@@ -15,7 +15,7 @@ class DomainParserTest(unittest.TestCase):
         self.assertEqual(2, len(records))
         expected = Record()
         expected.target = "2a04:dd00::327b:8888"
-        expected.ttl = 14440
+        expected.ttl = 800
         expected.name = "IPV6"
         expected.type = RecordType.AAAA
         self.assertIn(expected, records)
