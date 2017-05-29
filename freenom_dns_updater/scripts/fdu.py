@@ -139,7 +139,7 @@ def record_add(user, password, domain, name, type, target, ttl, update):
 @click.option('-a', '--target', help='Record target. An ip address for A records')
 @click.option('-l', '--ttl', help='Record time to live.', type=click.INT)
 @click.help_option('--help', '-h')
-def record_update(user, password, domain, name, type, target, ttl, update):
+def record_update(user, password, domain, name, type, target, ttl):
     d = {'login': user, 'password': password, 'record': []}
     record = {'domain': domain}
     if name:
@@ -156,7 +156,7 @@ def record_update(user, password, domain, name, type, target, ttl, update):
     ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, True), config, False)
 
     if ok_count:
-        click.echo('Record successfully added{}.'.format("/updated" if update else ""))
+        click.echo('Record successfully added/updated.')
     else:
         click.secho('No record updated', fg='yellow', bold=True)
 
