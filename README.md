@@ -118,6 +118,8 @@ There's two straightforward choices :
 - Launch the previous ```fdu process``` command 
 - Schedule the ```fdu update``` command using cron, windows' scheduled task, ...
 
+## Known issues
+- The domain [my.freenom.com](my.freenom.com) has [SSL Chain issues](https://www.ssllabs.com/ssltest/analyze.html?d=my.freenom.com). For now this tool use a custom ``chain.pem`` to avoid ssl errors. 
 
 ## Docker image
 [![Docker layers](https://badge.imagelayers.io/maxisoft/freenom-dns-updater:latest.svg)](https://imagelayers.io/?images=maxisoft/freenom-dns-updater:latest)

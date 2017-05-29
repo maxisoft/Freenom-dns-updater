@@ -1,5 +1,6 @@
 import re
 
+import pathlib
 import requests
 from bs4 import BeautifulSoup, Tag
 from copy import copy
@@ -18,6 +19,15 @@ class Freenom(object):
     def __init__(self, user_agent=default_user_agent, *args, **kwargs):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': user_agent})
+        self.session.verify = self.findcert() or False
+
+    @staticmethod
+    def findcert():
+        p = pathlib.Path(__file__).parent
+        p = (p / "data" / "chain.pem")
+        if p.exists():
+            return str(p)
+        return None
 
     def login(self, login, password, url="https://my.freenom.com/dologin.php"):
         token = self._get_login_token()
