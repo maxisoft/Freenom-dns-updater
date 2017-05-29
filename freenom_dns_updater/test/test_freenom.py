@@ -27,11 +27,10 @@ TEST_DOMAIN_NAME = str(os.getenv("FREENOM_TEST_DOMAIN_NAME", 'freenom-dns-update
 class FreenomTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(FreenomTest, self).__init__(*args, **kwargs)
-        self.config_file = self.find_freenom_config_file()
+        self.config_file = self.find_config_file("freenom.yml")
 
     def setUp(self):
         self.freenom = Freenom()
-        self.freenom.session.verify = False
         if self.config_file:
             self.config = Config(str(self.config_file))
             self.login = os.getenv("FREENOM_LOGIN", self.config.login)
@@ -42,11 +41,11 @@ class FreenomTest(unittest.TestCase):
             self.password = os.getenv("FREENOM_PASSWORD", None)
 
     @staticmethod
-    def find_freenom_config_file():
+    def find_config_file(name):
         current_path = pathlib.Path().absolute()
         p = current_path
         for i in range(3):
-            target = p / "freenom.yml"
+            target = p / name
             if target.exists():
                 return target
             p = p.parent
