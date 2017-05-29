@@ -12,6 +12,18 @@ from freenom_dns_updater import Freenom, Config, Domain, Record, RecordType
 from freenom_dns_updater.exception import UpdateError
 
 
+'''
+This test suite test the fdu unofficial api in real use case scenario.
+To use this suite you need a freenom account with at least 1 domain registered (for testing).
+
+Temporary export your login password as the following env variables: FREENOM_LOGIN and FREENOM_PASSWORD,
+then write your testing domain id and name as env variables : FREENOM_TEST_DOMAIN_ID and FREENOM_TEST_DOMAIN_NAME
+'''
+
+TEST_DOMAIN_ID = int(os.getenv("FREENOM_TEST_DOMAIN_ID", 1027889227))
+TEST_DOMAIN_NAME = str(os.getenv("FREENOM_TEST_DOMAIN_NAME", 'freenom-dns-updater.tk'))
+
+
 class FreenomTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(FreenomTest, self).__init__(*args, **kwargs)
@@ -19,6 +31,7 @@ class FreenomTest(unittest.TestCase):
 
     def setUp(self):
         self.freenom = Freenom()
+        self.freenom.session.verify = False
         if self.config_file:
             self.config = Config(str(self.config_file))
             self.login = os.getenv("FREENOM_LOGIN", self.config.login)
@@ -76,8 +89,8 @@ class FreenomTest(unittest.TestCase):
 
     def test_add_record(self):
         domain = Domain()
-        domain.id = '1012700019'
-        domain.name = 'freenom-dns-updater.cf'
+        domain.id = TEST_DOMAIN_ID
+        domain.name = TEST_DOMAIN_NAME
 
         record = Record()
         record.domain = domain
@@ -98,8 +111,8 @@ class FreenomTest(unittest.TestCase):
 
     def test_update_record(self):
         domain = Domain()
-        domain.id = '1012700019'
-        domain.name = 'freenom-dns-updater.cf'
+        domain.id = TEST_DOMAIN_ID
+        domain.name = TEST_DOMAIN_NAME
 
         record = Record()
         record.domain = domain
@@ -120,8 +133,8 @@ class FreenomTest(unittest.TestCase):
 
     def test_update_record_fail(self):
         domain = Domain()
-        domain.id = '1012700019'
-        domain.name = 'freenom-dns-updater.cf'
+        domain.id = TEST_DOMAIN_ID
+        domain.name = TEST_DOMAIN_NAME
 
         record = Record()
         record.domain = domain
@@ -148,8 +161,8 @@ class FreenomTest(unittest.TestCase):
 
     def test_remove_record(self):
         domain = Domain()
-        domain.id = '1012700019'
-        domain.name = 'freenom-dns-updater.cf'
+        domain.id = TEST_DOMAIN_ID
+        domain.name = TEST_DOMAIN_NAME
 
         record = Record()
         record.domain = domain
