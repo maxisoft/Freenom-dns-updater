@@ -1,0 +1,467 @@
+C:\tools\python3.5\python.exe "C:\Program Files (x86)\JetBrains\PyCharm 5.0.4\helpers\pycharm\utrunner.py" C:\Users\duboi\Documents\gitrepo\python\freenom-dns-updater\freenom_dns_updater\test\ true
+Testing started at 16:33 ...
+
+
+
+
+
+
+
+    <base href="https://my.freenom.com/" />    
+
+		
+		<!-- Load script for CSS3 & HMTL5 for older browsers -->
+		<script src="/templates/freenom/js/modernizr.js"></script>
+
+    <!-- <script type="text/javascript" src="/external/jquery.min.js"></script> -->
+    <script src="/templates/freenom/js/whmcs.js"></script>
+    
+    <!-- Load Freenom CSS -->
+    <link href="templates/freenom/css/reset.css" rel="stylesheet">
+   	<link href="templates/freenom/css/style.css" rel="stylesheet">
+   		<link href="templates/freenom/css/colors.css" rel="stylesheet">
+    
+    <!-- Load fonts from Google -->
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,300,700' rel='stylesheet' type='text/css'>
+    
+    <!-- Load icons from FontAwesome -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+    
+        <script type="text/javascript">
+        (function() {
+            if (typeof window.janrain !== "object") window.janrain = {};
+            window.janrain.settings = {};
+            janrain.settings.tokenUrl = "https://my.freenom.com/modules/addons/engage/callback.php?return_url=%2Fclientarea.php%3Fmanagedns%3Dfreenom-dns-updater.cf%26amp%3Bdomainid%3D1012700019";
+            function isReady() { janrain.ready = true; };
+            if (document.addEventListener) {
+              document.addEventListener("DOMContentLoaded", isReady, false);
+            } else {
+              window.attachEvent("onload", isReady);
+            }
+            var e = document.createElement("script");
+            e.type = "text/javascript";
+            e.id = "janrainAuthWidget";
+            if (document.location.protocol === "https:") {
+              e.src = "https://rpxnow.com/js/lib/connect.dot.tk/engage.js";
+            } else {
+              e.src = "http://widget-cdn.rpxnow.com/js/lib/connect.dot.tk/engage.js";
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(e, s);
+        })();
+        </script>
+    
+<script type="text/javascript">
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-29857775-2']);
+_gaq.push(['_setDomainName', 'freenom.com']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<section class="preHeader">
+	<div class="row">
+		<a href="clientarea.php"><img class="logo" src="templates/freenom/img/logo.png" alt="Freenom" /></a>
+	
+					<ul class="mainNav user pullRight">
+                    <li class="addFunds">
+                        <span>Solde de crédit disponible</span>
+                        <strong>€0.00EUR</strong>
+                    </li>
+                    <li class="addFunds button">
+                        <a class="smallBtn whiteBtn" href="clientarea.php?action=addfunds">Ajouter des fonds</a>
+                    </li>
+
+					<li class="dropDown">
+						<a href="">Bonjour maxime!&nbsp;
+												</a>
+						  <ul class="subNav level2 boxShadow borderRadius">
+								<li><a href="clientarea.php?action=details">Modifier les détails du compte</a></li>
+								
+																
+																	<li><a href="clientarea.php?action=addfunds">Ajouter des fonds</a></li>
+																
+								<li><a href="clientarea.php?action=emails">Emails envoyés</a></li>
+								<li><a href="clientarea.php?action=changepw">Modifier mot de passe</a></li>
+				        <li><a href="cart.php?a=view">Afficher le panier</a></li>
+								<li class="divider"></li>
+								<li><a href="logout.php">Se déconnecter</a></li>
+						  </ul>
+					</li>
+				</ul>
+						
+			
+	</div>
+</section>
+
+
+
+<section class="mainHeader">
+	<div class="row">
+		<ul class="mainNav">
+				<li><a href="clientarea.php">Accueil</a></li>
+			
+				<!--<li class="dropDown">
+				  <a href="clientarea.php?action=products">Services</a>
+				  	<ul class="subNav level2 boxShadow borderRadius">
+				    <li><a href="clientarea.php?action=products">Services</a></li>
+				    				    <li class="divider"></li>
+				    <li><a href="cart.php">Commander un nouveau service</a></li>
+				    <li><a href="cart.php?gid=addons">Afficher les ajouts disponibles</a></li>
+				  </ul>
+				</li>-->
+				
+				 <!-- Menu for domains -->
+								
+				<li class="dropDown">
+						<a href="clientarea.php?action=domains">Domaines</a>
+					  <ul class="subNav level2 boxShadow borderRadius">
+						<li><a href="clientarea.php?action=domains">Domaines</a></li>
+						<li class="divider"></li>
+						<li><a href="domains.php">Enregistrer un nouveau domaine</a></li>						<li><a href="domains.php?a=renewals">Renouveller les Domaines</a></li>
+						<li><a href="domains.php?a=transfers">Transférer domaines</a></li>				      					<!-- <li class="divider"></li> <li><a href="domainchecker.php">Recherche Whois</a></li> -->
+				</ul>        
+				
+								
+				 <!-- Menu for billing -->
+				
+				<li class="dropDown"><a href="clientarea.php?action=invoices">Factures&nbsp;</a>
+				  <ul class="subNav level2 boxShadow borderRadius">
+					<li><a href="clientarea.php?action=invoices">Factures</a></li>
+					<!--<li><a href="clientarea.php?action=quotes">Mes Devis</a></li>-->
+					<li class="divider"></li>
+					<li><a href="clientarea.php?action=addfunds">Ajouter des fonds</a></li>														  </ul>
+				</li>
+				
+				 <!-- Menu for support -->     
+				    
+				<li class="dropDown"><a href="supporttickets.php">Assistance</a>
+				  <ul class="subNav level2 boxShadow borderRadius">
+					<li><a href="supporttickets.php">Tickets</a></li>
+					<li><a href="knowledgebase.php">Base de connaissances</a></li>
+					<li><a href="downloads.php">Téléchargements</a></li>
+					<!--<li><a href="serverstatus.php">&Eacute;tat du réseau</a></li>-->
+				  </ul>
+				</li>
+				
+				 <!-- Menu for opening ticket -->
+				 
+				<li>
+					<a href="submitticket.php">Ouvrir un ticket</a>
+				</li>
+		
+		 	</ul>
+		 			 	
+		 	<ul class="quicklinkDomains pullRight">		 		
+		 		<!--<li class="numberDomainsCircle primaryColor"></li>
+		 		<li class="numberDomainsText">Domaines</li>-->
+		 		
+		 		
+		 		
+		 		<li class="newDomain"><a class="smallBtn primaryColor" href="domains.php">Enregistrer un nouveau domaine</a></li>
+		 		<!--<li class="manageDomain"><a href="clientarea.php?action=domains"><i class="fa fa-cog"></i></a></li>-->
+		 	</ul>
+		 	
+	</div>
+</section>
+
+
+
+
+
+
+
+
+<script src="/templates/freenom/js/home.js"></script>
+
+
+    
+    <style type="text/css">
+        a.deleter{
+            color: #cc1111 !important;
+            font-size: 10px;
+        }
+        a.deleter:hover{
+            text-decoration: underline !important;
+        }
+        .recordslist {
+             margin-top: 30px;
+        }
+        li.dnserror {
+            width: 450px;
+            color: #cc0000;
+            font-weight: bold;
+        }
+        li.dnssuccess {
+            width: 450px;
+            color: #00cc00;
+            font-weight: bold;
+        }
+        .manage_img { margin:0 3px -3px 0 !important; padding:0;  border:none; width:16px; height:16px; }
+    </style><script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('.dnsform button').click(function() {
+                jQuery(this).html('loading...');
+                jQuery(this).parent().append('<img style="padding-left: 30px;" src="modules/admin/dns_manager/loader.gif" />');
+                jQuery(this).parents('form').submit;
+                return true;
+            });
+            
+            jQuery(document).delegate('.selecttype', 'change', function()
+            {
+                var row = jQuery(this).parent().parent();
+                row.find('.addpriority').hide();
+                row.find('.addport').hide();
+                row.find('.addweight').hide();
+                row.find('.addforwardtype').hide();
+                row.find('.addforwardoptions').hide();
+                switch(jQuery(this).val())
+                {
+                    case 'MX':
+                        row.find('.addpriority').show();
+                        break;
+                    case 'SRV':
+                        row.find('.addpriority').show();
+                        row.find('.addport').show();
+                        row.find('.addweight').show();
+                        break;
+                    case 'F':
+                        row.find('.addforwardtype').show();
+                        row.find('.addforwardoptions').show();    
+                        break;
+                }
+            });
+
+            jQuery(document).delegate('#add_record', 'click', function(){
+                var row_count = jQuery('#add_record_table > tbody > tr').length;
+                var last_row_id = parseInt(jQuery('#add_record_table > tbody > tr:last input:first').attr('name').replace('addrecord[', ''));
+                var record_row = jQuery('#add_record_table_example_template > tbody > tr').clone();
+                record_row.find('.add_record_field').each(function(){
+                    var old_name = jQuery(this).attr('name');
+                    var new_name = old_name.replace('addrecord[0]', 'addrecord['+(last_row_id+1)+']')
+                    jQuery(this).attr('name', new_name);
+                });
+                var row = jQuery(this).parent().parent(); 
+                jQuery('#add_record_table > tbody > tr .del_record').attr('disabled', !(row_count >= 1));
+                jQuery('#add_record_table > tbody').append(record_row);
+                return false;
+            });
+                
+            jQuery(document).delegate('.del_record', 'click', function(){
+                var row = jQuery(this).parent().parent();
+                row.remove();
+                var row_count = jQuery('#add_record_table > tbody > tr').length;
+                if(row_count <= 1)
+                    jQuery('#add_record_table > tbody > tr .del_record').attr('disabled', true);
+                return false;
+            });
+                
+                
+        });
+        </script>
+    
+   
+  
+        
+	    <section class="pageHeader">
+	        <h1 class="primaryFontColor">DNS MANAGEMENT for freenom-dns-updater.cf</h1>
+	    </section>
+	    
+	    <section class="domainContent">
+	    	<div class="row centered margin padding">
+	    		<div class="span12 pullLeft">
+        	<div>
+              
+        
+                        <ul style="list-style: none; margin-top: 15px; margin-left: 0px;">
+                                <li style="float: left;"><a href="/clientarea.php?action=domaindetails&id=1012700019" title="" class="btn">Back to domain details</a></li> 
+                <br/>
+
+                            </ul>
+            <div style="width: 100%; clear: both;"></div>
+        
+                                        <div class="recordslist">
+                                        <ul>                        <li class="dnssuccess">Record deleted successfully</li>
+                                            <li class="dnssuccess">Record added successfully</li>
+                    </ul>
+                                    </div>
+                                <form action="" method="post" >
+<input type="hidden" name="token" value="c7e95b44786f76ad4c6d8693d5efaa6d3ba2fef5" />
+                    <input type="hidden" name="dnsaction" value="modify" />
+                    <table width="100%" cellpadding="5" cellspacing="0" border="0" class="data table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th align="left">Name</th>
+                            <th>Type</th>
+                            <th align="left">TTL</th>                            <th align="left">Target</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                                                <tr>
+                            <td valign="top"><input type="hidden" name="records[0][line]" value="" /><input type="hidden" name="records[0][type]" value="A" /><input type="text" name="records[0][name]" value="TEST" size="25" /></td>
+                            <td valign="top"><strong>A</strong></td>
+                            <td valign="top"><input type="text" name="records[0][ttl]" value="28880" style="width: 60px" /></td>                            <td valign="top" style="width:28%">
+                                <p style="padding: 0px 5px 0px 5px; overflow: auto;"><input type="text" name="records[0][value]" value="185.45.193.90" size="30" /></p>
+                                                                                                                            </td>
+                            <td valign="top"><a href="clientarea.php?managedns=freenom-dns-updater.cf&page=&records=A&dnsaction=delete&name=TEST&value=185.45.193.90&line=&ttl=28880&priority=&weight=&port=&domainid=1012700019" onclick="if(confirm('Do you really want to remove this entry?')) return true; return false;" class="deleter">Delete</a></td>
+                        </tr>
+                                                <tr>
+                            <td valign="top"><input type="hidden" name="records[1][line]" value="" /><input type="hidden" name="records[1][type]" value="AAAA" /><input type="text" name="records[1][name]" value="" size="25" /></td>
+                            <td valign="top"><strong>AAAA</strong></td>
+                            <td valign="top"><input type="text" name="records[1][ttl]" value="14440" style="width: 60px" /></td>                            <td valign="top" style="width:28%">
+                                <p style="padding: 0px 5px 0px 5px; overflow: auto;"><input type="text" name="records[1][value]" value="2a04:dd00::327b:9f5d" size="30" /></p>
+                                                                                                                            </td>
+                            <td valign="top"><a href="clientarea.php?managedns=freenom-dns-updater.cf&page=&records=AAAA&dnsaction=delete&name=&value=2a04%3Add00%3A%3A327b%3A9f5d&line=&ttl=14440&priority=&weight=&port=&domainid=1012700019" onclick="if(confirm('Do you really want to remove this entry?')) return true; return false;" class="deleter">Delete</a></td>
+                        </tr>
+                                                </tbody>
+                    </table>
+                    <button  class="btn" style="margin: 20px; font-weight: bold">Save Changes</button>
+                </form>
+                                <p style="font-weight:bold; font-size: 14px; margin-top: 30px;">Add Record</p>
+                <table class="data table table-striped table-bordered" width="100%" cellpadding="5" cellspacing="0" border="0" style="display: none" id="add_record_table_example_template" >
+                    <thead></thead>
+                    <tbody>
+                        <tr>
+                            <td valign="top"><input type="text" name="addrecord[0][name]" value="" size="25" class="add_record_field" /></td>
+                            <td valign="top">
+                                <select name="addrecord[0][type]" class="selecttype add_record_field" >
+                                                                    <option value="A">A</option>
+                                                                    <option value="AAAA">AAAA</option>
+                                                                    <option value="CNAME">CNAME</option>
+                                                                    <option value="LOC">LOC</option>
+                                                                    <option value="MX">MX</option>
+                                                                    <option value="NAPTR">NAPTR</option>
+                                                                    <option value="RP">RP</option>
+                                                                    <option value="TXT">TXT</option>
+                                                                </select>
+                            </td>
+                            <td valign="top"><input type="text" name="addrecord[0][ttl]" value="14440" style="width: 60px" class="add_record_field" /></td>                            <td valign="top" style="width:225px">
+                                <p style="padding: 0px 5px 0px 5px; overflow: auto;"><input type="text" name="addrecord[0][value]" value="" size="30" class="add_record_field" /></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addpriority"><span>Priority:</span><input type="text" name="addrecord[0][priority]" value="" style="width:150px;float:right" class="add_record_field" /></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addport"><span>Port:</span><input type="text" name="addrecord[0][port]" value="" style="width:150px;float:right" class="add_record_field" /></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addweight"><span>Weight:</span><input type="text" name="addrecord[0][weight]" value="" style="width:150px;float:right" class="add_record_field" /></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addforwardtype"><span>Type:</span><select name="addrecord[0][forward_type]" style="width:150px;float:right" class="add_record_field" ><option value="1">Forward</option><option value="2">Mask</option><option value="3">301 Redirect</option></select></p>
+                                <p style="padding: 5px; display: none; overflow: auto;" class="addforwardoptions"><span>Redirect to the exact URL:</span><input type="checkbox" name="addrecord[0][forward_url]" value="1" style="float:right" class="add_record_field" /></p>
+                            </td>
+                            <td style="vertical-align:text-top;">
+                                <button class="smallBtn cautionColor pullRight" style="font-weight: bold"><i class="fa fa-times"></i> Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <form action="" method="post" >
+<input type="hidden" name="token" value="c7e95b44786f76ad4c6d8693d5efaa6d3ba2fef5" />
+                    <input type="hidden" name="dnsaction" value="add" />
+                    <table width="100%" cellpadding="5" cellspacing="0" border="0" id="add_record_table"  class="data table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th align="left">Name</th>
+                                <th>Type</th>
+                                <th align="left">TTL</th>                                <th align="left">Target</th><th></th></tr>
+                        </thead
+                        <tbody>
+                            <tr>
+                                <td valign="top"><input type="text" name="addrecord[0][name]" value="" size="25" /></td>
+                                <td valign="top">
+                                    <select name="addrecord[0][type]" class="selecttype" >
+                                                                            <option value="A">A</option>
+                                                                            <option value="AAAA">AAAA</option>
+                                                                            <option value="CNAME">CNAME</option>
+                                                                            <option value="LOC">LOC</option>
+                                                                            <option value="MX">MX</option>
+                                                                            <option value="NAPTR">NAPTR</option>
+                                                                            <option value="RP">RP</option>
+                                                                            <option value="TXT">TXT</option>
+                                                                        </select>
+                                </td>
+                                <td valign="top"><input type="text" name="addrecord[0][ttl]" value="14440" style="width: 60px" /></td>                                <td valign="top" style="width:225px">
+                                    <p style="padding: 0px 5px 0px 5px; overflow: auto;"><input type="text" name="addrecord[0][value]" value="" size="30" /></p>
+                                    <p style="padding: 5px; display: none; overflow: auto;" class="addpriority"><span>Priority:</span><input type="text" name="addrecord[0][priority]" value="" style="width:150px;float:right" /></p>
+                                    <p style="padding: 5px; display: none; overflow: auto;" class="addport"><span>Port:</span><input type="text" name="addrecord[0][port]" value="" style="width:150px;float:right" /></p>
+                                    <p style="padding: 5px; display: none; overflow: auto;" class="addweight"><span>Weight:</span><input type="text" name="addrecord[0][weight]" value="" style="width:150px;float:right" /></p>
+                                    <p style="padding: 5px; display: none; overflow: auto;" class="addforwardtype"><span>Type:</span><select name="addrecord[0][forward_type]" style="width:150px;float:right" ><option value="1">Forward</option><option value="2">Mask</option><option value="3">301 Redirect</option></select></p>
+                                    <p style="padding: 5px; display: none; overflow: auto;" class="addforwardoptions"><span>Redirect to the exact URL:</span><input type="checkbox" name="addrecord[0][forward_url]" value="1" style="float:right" /></p>
+                                </td>
+                                <td style="vertical-align:text-top;">
+                                    <button class="smallBtn cautionColor pullRight" disabled style="font-weight: bold"><i class="fa fa-times"></i> Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button id="add_record" class="smallBtn greyBtn" style="margin: 20px 0px 20px 5px;"><i class="fa fa-plus"></i> More Records</button>
+                    <button class="smallBtn primaryColor" style="margin: 20px 20px 20px 5px; font-weight: bold">Save Changes</button>
+                </form>
+                </div>
+    </div>
+    </section>
+    
+
+
+
+       
+
+
+
+<!--Start of footer.tpl-->
+
+<section class="footer">
+	<div class="row centered padding margin textCenter">
+		<div class="span12">
+<!--				<div id="copyright">Droit d&apos;auteur &copy; 2016 Dot ML. Tous droits réservés.</div> -->
+								<div class="clear"></div>
+		</div></section>
+<div class="footerdivider">
+    <div class="fill"></div>
+</div>
+
+<div class="footer-wrap">
+    <div class="footer">
+        <div style='display:none;' id="copyright">Droit d&apos;auteur &copy; 2016 Freenom. Tous droits réservés.</div>
+                <div class="clear"></div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+   var _mfq = _mfq || [];
+   (function() {
+       var mf = document.createElement("script"); mf.type = "text/javascript"; mf.async = true;
+       mf.src = "//cdn.mouseflow.com/projects/070520d7-41e5-4d19-a2b7-821e92edeea1.js";
+       document.getElementsByTagName("head")[0].appendChild(mf);
+   })();
+</script>
+
+
+</body>
+</html>
+<!--End of footer.tpl-->
+
+
+Failure
+Traceback (most recent call last):
+  File "C:\Users\duboi\Documents\gitrepo\python\freenom-dns-updater\freenom_dns_updater\test\test_freenom.py", line 90, in test_update_record
+    self.assertTrue(bool(res))
+AssertionError: False is not true
+
+
+Process finished with exit code 0
