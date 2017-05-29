@@ -45,15 +45,15 @@ class GetMyIpTestMock(unittest.TestCase):
         self.assertEqual(ipaddress.ip_address(u"49.20.57.31"), res)
 
     @httpretty.activate
-    def test_get_my_ip(self):
+    def test_get_my_ipv6(self):
         httpretty.register_uri(httpretty.GET, "http://test.com/",
                                body=json.dumps({
                                    "address": "fd2b:1c1b:3641:1cd8::",
                                    "proto": "ipv6"}),
                                content_type='text/json')
 
-        res = get_my_ip('http://test.com/')
-        self.assertIsInstance(res, ipaddress._BaseAddress)
+        res = get_my_ipv6('http://test.com/')
+        self.assertIsInstance(res, ipaddress.IPv6Address)
         self.assertEqual(ipaddress.ip_address(u"fd2b:1c1b:3641:1cd8::"), res)
 
 
