@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+   fdu:
+     restart: always
+     image: fdu
+     container_name: freenom
+     volumes:
+       - freenomdata:/etc/
+
+volumes:
+   freenomdata:
