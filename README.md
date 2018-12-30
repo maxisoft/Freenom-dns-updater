@@ -1,13 +1,15 @@
+### A note from _bitteruhe_
+This is a fork of [maxisoft](https://github.com/maxisoft/)'s (apparently abandoned) [project](https://github.com/maxisoft/Freenom-dns-updater).  
+This fork became necessary when an [issue with freenom's login form](https://github.com/maxisoft/Freenom-dns-updater/issues/11) was found and never fixed. The fork fixes this issue with the help of a [solution](https://github.com/maxisoft/Freenom-dns-updater/issues/11#issuecomment-345633463) found by [Shihira](https://github.com/shihira).
+
+----
+
 # Freenom dns updater
 A tool written in python to update [freenom](http://Freenom.com)'s dns records
 
-[![Build Status](https://travis-ci.org/maxisoft/Freenom-dns-updater.svg?branch=master)](https://travis-ci.org/maxisoft/Freenom-dns-updater)
-[![PyPI Version](https://img.shields.io/pypi/v/freenom-dns-updater.svg)](https://pypi.python.org/pypi/freenom-dns-updater)
-[![PyPI](https://img.shields.io/pypi/l/freenom-dns-updater.svg)](https://pypi.python.org/pypi/freenom-dns-updater)
-
 ## Main Features
 * Manage (add/update/remove) a domain's dns record with cli
-* Automatic records updates according to ip (v4/v6) changes 
+* Automatic records updates according to ip (v4/v6) changes
 
 ## Upcoming features
 * Auto renew domains
@@ -20,16 +22,16 @@ pip install freenom-dns-updater
 
 ### Basic usage
 Let's say you want to add or update your main A/AAAA domain records *exemple.tk* with your current ip (v4/v6).
-Simply type : 
+Simply type :
 ```
 fdu record update $LOGIN $PASSWORD exemple.tk
 ```
 
-Note that if you don't have a ipv6 access, the tool will detect that and will update only the A record (ipv4) of *exemple.tk*.
+Note that if you don't have a ipv6 access, the tool will detect that and will update only the A record (ipv4) of *example.tk*.
 
-In order to add or update the subdomain *sub.exemple.tk*:
+In order to add or update the subdomain *sub.example.tk*:
 ```
-fdu record update $LOGIN $PASSWORD exemple.tk -n sub
+fdu record update $LOGIN $PASSWORD example.tk -n sub
 ```
 
 
@@ -82,7 +84,7 @@ In order to use such configuration, you can use the following command :
 fdu update /path/to/config
 ```
 
-Where */path/to/config* can be either: 
+Where */path/to/config* can be either:
 - A path to a file (default location is ```/etc/freenom.yml```)
 - A http url (a raw secret [gist](https://gist.githubusercontent.com/maxisoft/1b979b64e4cf5157d58d/raw/freenom.yml) for instance)
 
@@ -106,7 +108,7 @@ Where the params are :
 For ease of use a systemd unit file is available along the source code.
 - Save your configuration into ```/etc/freenom.yml```
 - Copy the ```systemd/system/freenom-dns-updater.service``` into a valid systemd unit folder (```/usr/lib/systemd/system/``` for instance).  
-- finally enable the service using 
+- finally enable the service using
 ```
 systemctl enable freenom-dns-updater
 systemctl start freenom-dns-updater
@@ -115,20 +117,20 @@ systemctl start freenom-dns-updater
 
 ### Using other Os / services manager
 There's two straightforward choices :  
-- Launch the previous ```fdu process``` command 
+- Launch the previous ```fdu process``` command
 - Schedule the ```fdu update``` command using cron, windows' scheduled task, ...
 
 ## Known issues
-- The domain [my.freenom.com](my.freenom.com) has [SSL Chain issues](https://www.ssllabs.com/ssltest/analyze.html?d=my.freenom.com). For now this tool use a custom ``chain.pem`` to avoid ssl errors. 
+- The domain [my.freenom.com](my.freenom.com) has [SSL Chain issues](https://www.ssllabs.com/ssltest/analyze.html?d=my.freenom.com). For now this tool use a custom ``chain.pem`` to avoid ssl errors.
 
 ## Docker image
 [![Docker layers](https://badge.imagelayers.io/maxisoft/freenom-dns-updater:latest.svg)](https://imagelayers.io/?images=maxisoft/freenom-dns-updater:latest)
 
-If you want to run this tool in an isolated environment there's a docker image available at 
+If you want to run this tool in an isolated environment there's a docker image available at
 [maxisoft/freenom-dns-updater](https://hub.docker.com/r/maxisoft/freenom-dns-updater/)
 
 ### Ipv6
-Note that if you want to use the ipv6 functionality, you have to enable the [docker ipv6 stack](https://docs.docker.com/v1.5/articles/networking/#ipv6) 
+Note that if you want to use the ipv6 functionality, you have to enable the [docker ipv6 stack](https://docs.docker.com/v1.5/articles/networking/#ipv6)
 
 ### Examples
 - Update dns records using a gist config file :
@@ -141,5 +143,5 @@ docker run -d --rm -v /path/to/config:/etc/freenom.yml maxisoft/freenom-dns-upda
 ```
 
 ### For armhf
-There's also an image for armhf (raspberry pi for instance) available at 
+There's also an image for armhf (raspberry pi for instance) available at
 [maxisoft/freenom-dns-updater-armhf](https://hub.docker.com/r/maxisoft/freenom-dns-updater-armhf)
