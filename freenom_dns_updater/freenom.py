@@ -34,7 +34,7 @@ class Freenom(object):
         playload = {'token': token,
                     'username': login,
                     'password': password}
-        r = self.session.post(url, playload)
+        r = self.session.post(url, playload, headers={'Host': 'my.freenom.com', 'Referer': 'https://my.freenom.com/clientarea.php'})
         assert r, "couldn't get %s" % url
         return self.is_logged_in(r)
 
