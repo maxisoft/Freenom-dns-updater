@@ -1,6 +1,6 @@
 import datetime
 from copy import copy
-
+import time
 import pathlib
 import requests
 from bs4 import BeautifulSoup
@@ -18,7 +18,7 @@ class Freenom(object):
     def __init__(self, user_agent=default_user_agent, *args, **kwargs):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': user_agent})
-        self.session.verify = self.findcert() or False
+        #self.session.verify = self.findcert() or False
 
     @staticmethod
     def findcert():
@@ -32,8 +32,11 @@ class Freenom(object):
         token = self._get_login_token()
         playload = {'token': token,
                     'username': login,
-                    'password': password}
-        r = self.session.post(url, playload)
+                    'password': password,
+                    'rememberme': ''
+                    }
+        time.sleep(1)
+        r = self.session.post(url, playload, headers={'Host': 'my.freenom.com', 'Referer': 'https://my.freenom.com/clientarea.php'})
         assert r, "couldn't get %s" % url
         return self.is_logged_in(r)
 
@@ -41,12 +44,14 @@ class Freenom(object):
         token = self._get_domain_token()
         playload = {'token': token,
                     'itemlimit': 'all'}
+        time.sleep(1)
         r = self.session.post(url, playload)
         assert r, "couldn't get %s" % url
         return DomainParser.parse(r.text)
 
     def list_records(self, domain):
         url = self.manage_domain_url(domain)
+        time.sleep(1)
         r = self.session.get(url)
         assert r, "couldn't get %s" % url
         ret = RecordParser.parse(r.text)
@@ -80,6 +85,7 @@ class Freenom(object):
         playload[record_id + "[weight]"] = ""
         playload[record_id + "[forward_type]"] = "1"
 
+        time.sleep(1)
         r = self.session.post(url, data=playload)
         soup = BeautifulSoup(r.text, "html.parser")
         errs = soup.find_all(attrs={'class': 'dnserror'})
@@ -107,6 +113,7 @@ class Freenom(object):
             playload[record_id + "[ttl]"] = str(rec.ttl)
             playload[record_id + "[value]"] = str(rec.target)
 
+        time.sleep(1)
         r = self.session.post(url, data=playload)
         soup = BeautifulSoup(r.text, "html.parser")
         errs = soup.find_all(attrs={'class': 'dnserror'})
@@ -161,6 +168,7 @@ class Freenom(object):
             playload[record_id + "[ttl]"] = str(rec.ttl)
             playload[record_id + "[value]"] = str(rec.target)
 
+        time.sleep(1)
         return bool(self.session.post(url, data=playload))
 
     @staticmethod
@@ -169,12 +177,14 @@ class Freenom(object):
 
     def renew(self, domain):
         if domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=13):
+            time.sleep(1)
             r = self.session.get("https://my.freenom.com/domains.php?a=renewdomain&domain={0.id}".format(domain))
             return bool(r)
         return False
 
     def is_logged_in(self, r=None, url="https://my.freenom.com/clientarea.php"):
         if r is None:
+            time.sleep(1)
             r = self.session.get(url)
             assert r, "couldn't get %s" % url
         return '<section class="greeting">' in r.text
@@ -189,6 +199,7 @@ class Freenom(object):
         return self._get_token(url)
 
     def _get_token(self, url):
+        time.sleep(1)
         r = self.session.get(url)
         assert r, "couldn't get %s" % url
         soup = BeautifulSoup(r.text, "html.parser")
