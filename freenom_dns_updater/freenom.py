@@ -20,9 +20,10 @@ class Freenom(object):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': user_agent})
         cert = self.findcert()
-        self.session.verify = False
-        if cert is not None:
-            self.session.verify = cert
+        #self.session.verify = False
+        #if cert is not None:
+        #    self.session.verify = cert
+        self.session.verify = True
 
     @staticmethod
     def findcert():
