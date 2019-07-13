@@ -175,11 +175,24 @@ class Freenom(object):
     def manage_domain_url(domain):
         return "https://my.freenom.com/clientarea.php?managedns={0.name}&domainid={0.id}".format(domain)
 
-    def renew(self, domain):
-        if domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=13):
+    def need_renew(self, domain):
+        return domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=13)
+
+    def renew(self, domain, period="12M", url='https://my.freenom.com/domains.php?submitrenewals=true'):
+        if self.need_renew(domain):
+            # keep this request to simulate humain usage
+            token = self._get_renew_token(domain)
+            playload = {'token': token,
+                'renewalid': "{0.id}".format(domain),
+                'renewalperiod[{0.id}]'.format(domain): period,
+                'paymentmethod': 'credit'
+                }
+            headers = {'Host': 'my.freenom.com',
+            'Referer': "https://my.freenom.com/domains.php?a=renewdomain&domain={0.id}".format(domain)}
             time.sleep(1)
-            r = self.session.get("https://my.freenom.com/domains.php?a=renewdomain&domain={0.id}".format(domain))
-            return bool(r)
+            r = self.session.post(url, playload, headers=headers)
+            assert r, "couldn't get %s" % url
+            return 'Order Confirmation' in r.text
         return False
 
     def is_logged_in(self, r=None, url="https://my.freenom.com/clientarea.php"):
@@ -197,6 +210,9 @@ class Freenom(object):
 
     def _get_manage_domain_token(self, url):
         return self._get_token(url)
+
+    def _get_renew_token(self, domain, url="https://my.freenom.com/domains.php?a=renewdomain&domain={0.id}"):
+        return self._get_token(url.format(domain))
 
     def _get_token(self, url):
         time.sleep(1)
