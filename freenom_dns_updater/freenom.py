@@ -19,19 +19,8 @@ class Freenom(object):
     def __init__(self, user_agent=DEFAULT_USER_AGENT, *args, **kwargs):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': user_agent})
-        cert = self.findcert()
-        #self.session.verify = False
-        #if cert is not None:
-        #    self.session.verify = cert
         self.session.verify = True
 
-    @staticmethod
-    def findcert():
-        p = pathlib.Path(__file__).parent
-        p = (p / "data" / "chain.pem")
-        if p.exists():
-            return str(p)
-        return None
 
     def login(self, login, password, url=FREENOM_BASE_URL+"/dologin.php"):
         token = self._get_login_token()
