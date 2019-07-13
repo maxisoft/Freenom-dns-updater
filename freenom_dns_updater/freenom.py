@@ -11,11 +11,12 @@ from .exception import UpdateError, AddError
 from .record import Record
 from .record_parser import RecordParser
 
-default_user_agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"
+DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"
+FREENOM_BASE_URL = 'https://my.freenom.com'
 
 
 class Freenom(object):
-    def __init__(self, user_agent=default_user_agent, *args, **kwargs):
+    def __init__(self, user_agent=DEFAULT_USER_AGENT, *args, **kwargs):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': user_agent})
         #self.session.verify = self.findcert() or False
@@ -28,7 +29,7 @@ class Freenom(object):
             return str(p)
         return None
 
-    def login(self, login, password, url="https://my.freenom.com/dologin.php"):
+    def login(self, login, password, url=FREENOM_BASE_URL+"/dologin.php"):
         token = self._get_login_token()
         playload = {'token': token,
                     'username': login,
@@ -36,11 +37,11 @@ class Freenom(object):
                     'rememberme': ''
                     }
         time.sleep(1)
-        r = self.session.post(url, playload, headers={'Host': 'my.freenom.com', 'Referer': 'https://my.freenom.com/clientarea.php'})
+        r = self.session.post(url, playload, headers={'Host': 'my.freenom.com', 'Referer': FREENOM_BASE_URL+'/clientarea.php'})
         assert r, "couldn't get %s" % url
         return self.is_logged_in(r)
 
-    def list_domains(self, url='https://my.freenom.com/clientarea.php?action=domains'):
+    def list_domains(self, url=FREENOM_BASE_URL+'/clientarea.php?action=domains'):
         token = self._get_domain_token()
         playload = {'token': token,
                     'itemlimit': 'all'}
@@ -173,14 +174,14 @@ class Freenom(object):
 
     @staticmethod
     def manage_domain_url(domain):
-        return "https://my.freenom.com/clientarea.php?managedns={0.name}&domainid={0.id}".format(domain)
+        return FREENOM_BASE_URL+"/clientarea.php?managedns={0.name}&domainid={0.id}".format(domain)
 
     def need_renew(self, domain):
         return domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=13)
 
-    def renew(self, domain, period="12M", url='https://my.freenom.com/domains.php?submitrenewals=true'):
+    def renew(self, domain, period="12M", url=FREENOM_BASE_URL+'/domains.php?submitrenewals=true'):
         if self.need_renew(domain):
-            # keep this request to simulate humain usage
+            # keep this request to simulate humain usage and get token
             token = self._get_renew_token(domain)
             playload = {'token': token,
                 'renewalid': "{0.id}".format(domain),
@@ -188,30 +189,30 @@ class Freenom(object):
                 'paymentmethod': 'credit'
                 }
             headers = {'Host': 'my.freenom.com',
-            'Referer': "https://my.freenom.com/domains.php?a=renewdomain&domain={0.id}".format(domain)}
+            'Referer': FREENOM_BASE_URL+"/domains.php?a=renewdomain&domain={0.id}".format(domain)}
             time.sleep(1)
             r = self.session.post(url, playload, headers=headers)
             assert r, "couldn't get %s" % url
             return 'Order Confirmation' in r.text
         return False
 
-    def is_logged_in(self, r=None, url="https://my.freenom.com/clientarea.php"):
+    def is_logged_in(self, r=None, url=FREENOM_BASE_URL+"/clientarea.php"):
         if r is None:
             time.sleep(1)
             r = self.session.get(url)
             assert r, "couldn't get %s" % url
         return '<section class="greeting">' in r.text
 
-    def _get_login_token(self, url="https://my.freenom.com/clientarea.php"):
+    def _get_login_token(self, url=FREENOM_BASE_URL+"/clientarea.php"):
         return self._get_token(url)
 
-    def _get_domain_token(self, url='https://my.freenom.com/clientarea.php?action=domains'):
+    def _get_domain_token(self, url=FREENOM_BASE_URL+'/clientarea.php?action=domains'):
         return self._get_token(url)
 
     def _get_manage_domain_token(self, url):
         return self._get_token(url)
 
-    def _get_renew_token(self, domain, url="https://my.freenom.com/domains.php?a=renewdomain&domain={0.id}"):
+    def _get_renew_token(self, domain, url=FREENOM_BASE_URL+"/domains.php?a=renewdomain&domain={0.id}"):
         return self._get_token(url.format(domain))
 
     def _get_token(self, url):
