@@ -170,7 +170,7 @@ class Freenom(object):
         return FREENOM_BASE_URL+"/clientarea.php?managedns={0.name}&domainid={0.id}".format(domain)
 
     def need_renew(self, domain):
-        return domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=13)
+        return domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=14)
 
     def renew(self, domain, period="12M", url=FREENOM_BASE_URL+'/domains.php?submitrenewals=true'):
         if self.need_renew(domain):
