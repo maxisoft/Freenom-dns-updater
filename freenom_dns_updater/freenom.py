@@ -189,6 +189,33 @@ class Freenom(object):
             return 'Order Confirmation' in r.text
         return False
 
+    def set_nameserver(self, domain, ns):
+        if domain is None:
+            return False
+        url = FREENOM_BASE_URL + '/clientarea.php?action=domaindetails&id={0.id}'.format(domain)
+        i = 1
+        token = self._get_set_ns_token(domain)
+        params = {
+                'id': domain.id,
+                'token': token,
+                'sub': 'savens',
+                'nschoice': 'custom'
+                }
+        for e in ns:
+            params['ns' + str(i)] = e
+            i += 1
+        while i <= 5:
+            params['ns' + str(i)] = ''
+            i += 1
+        headers = {
+                'Host': 'my.freenom.com',
+                'Referer': url
+                }
+        time.sleep(1)
+        r = self.session.post(url, params, headers=headers)
+        assert r, "couldn't get %s" % url
+        return 'Changes Saved Successfully!' in r.text
+
     def is_logged_in(self, r=None, url=FREENOM_BASE_URL+"/clientarea.php"):
         if r is None:
             time.sleep(1)
@@ -206,6 +233,9 @@ class Freenom(object):
         return self._get_token(url)
 
     def _get_renew_token(self, domain, url=FREENOM_BASE_URL+"/domains.php?a=renewdomain&domain={0.id}"):
+        return self._get_token(url.format(domain))
+    
+    def _get_set_ns_token(self, domain, url=FREENOM_BASE_URL+"/clientarea.php?action=domaindetails&domain={0.id}"):
         return self._get_token(url.format(domain))
 
     def _get_token(self, url):
