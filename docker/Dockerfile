@@ -18,5 +18,11 @@ RUN python -m easy_install ./*.egg && \
 
 WORKDIR /
 
-CMD fdu process /etc/freenom.yml
+# Make sure that we can run container
+#  and pass args directly to our script
+ENTRYPOINT [ "fdu" ]
+
+# By default we will start an auto-update process
+#  with a configuration file passed to it
+CMD process /etc/freenom.yml
 
