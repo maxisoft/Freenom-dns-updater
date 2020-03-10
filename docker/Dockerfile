@@ -24,5 +24,5 @@ ENTRYPOINT [ "fdu" ]
 
 # By default we will start an auto-update process
 #  with a configuration file passed to it
-CMD process /etc/freenom.yml
+CMD ["process", "/etc/freenom.yml"]
 
