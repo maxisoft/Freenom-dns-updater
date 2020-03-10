@@ -5,6 +5,14 @@ class DnsRecordBaseException(Exception):
         self._record = record
         self._old_record_list = old_record_list
 
+    def __str__(self):
+        return "%s(msgs=%s, record=%s, old_record_list=%s)" % (
+            type(self).__name__,
+            self.msgs,
+            self.record,
+            self.old_record_list
+        )
+
     @property
     def msgs(self):
         return self._msgs

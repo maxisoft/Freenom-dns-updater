@@ -15,6 +15,7 @@ import six
 import yaml
 
 import freenom_dns_updater
+from freenom_dns_updater.exception import UpdateError
 from freenom_dns_updater.get_my_ip import *
 
 is_windows = any(platform.win32_ver())
@@ -153,11 +154,19 @@ def record_update(user, password, domain, name, type, target, ttl):
     d['record'].append(record)
     config = freenom_dns_updater.Config(d)
 
-    ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, True), config, False)
+    ok_count = 0
+    try:
+        ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, True), config, False)
 
-    if ok_count:
-        click.echo('Record successfully added/updated')
-    else:
+        if ok_count:
+            click.echo('Record successfully added/updated')
+    except UpdateError as update_error:
+        if all(msg != 'There were no changes' for msg in update_error.msgs):
+            click.echo("Update errors: %s" % update_error.msgs, err=True)
+    except Exception as e:
+        click.echo("Error while updating: %s" % e, err=True)
+
+    if not ok_count:
         click.secho('No record updated', fg='yellow', bold=True)
 
 
