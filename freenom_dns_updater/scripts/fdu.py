@@ -205,14 +205,21 @@ def record_rm(user, password, domain, name, type, target, ttl, update):
 def _update(config, ignore_errors):
     config = freenom_dns_updater.Config(config_src(config))
 
-    ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, True), config, ignore_errors)
+    ok_count = 0
+    try:
+        ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, True), config, ignore_errors)
 
-    if ok_count:
         if not err_count:
             click.echo('Successfully Updated {} record{}'.format(ok_count, "s" if ok_count > 1 else ""))
         else:
             click.echo('Updated {} record{}'.format(ok_count, "s" if ok_count > 1 else ""))
-    else:
+    except UpdateError as update_error:
+        if all(msg != 'There were no changes' for msg in update_error.msgs):
+            click.echo("Update errors: %s" % update_error.msgs, err=True)
+    except Exception as e:
+        click.echo("Error while updating: %s" % e, err=True)
+
+    if not ok_count:
         click.secho('No record updated', fg='yellow', bold=True)
 
 
