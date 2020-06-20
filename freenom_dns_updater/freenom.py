@@ -19,7 +19,6 @@ class Freenom(object):
     def __init__(self, user_agent=default_user_agent, *args, **kwargs):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': user_agent})
-        self.session.verify = self.findcert() or False
 
     @staticmethod
     def findcert():
