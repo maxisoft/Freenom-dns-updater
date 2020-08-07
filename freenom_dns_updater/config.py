@@ -24,10 +24,10 @@ class Config(dict):
         if isinstance(src, dict):
             content = src
         elif hasattr(src, 'read'):
-            content = yaml.load(src)
+            content = yaml.safe_load(src)
         else:
             with open(src) as f:
-                content = yaml.load(f)
+                content = yaml.safe_load(f)
         self.clear()
         self.update(content)
         self._records = None
