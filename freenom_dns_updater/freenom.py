@@ -1,7 +1,7 @@
 import pathlib
 import warnings
-from copy import copy
 from typing import Optional, List
+from urllib.parse import urljoin, urlparse, quote
 
 import requests
 from bs4 import BeautifulSoup
@@ -14,9 +14,15 @@ from .record_parser import RecordParser
 
 default_user_agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"
 
+_base_url = "https://my.freenom.com"
+parsed_base_url = urlparse(_base_url)
+login_url = urljoin(_base_url, 'dologin.php')
+client_area_url = urljoin(_base_url, 'clientarea.php')
+list_domain_url = f'{client_area_url}?action=domains'
+
 
 class Freenom(object):
-    def __init__(self, user_agent=default_user_agent, *args, **kwargs):
+    def __init__(self, user_agent: str = default_user_agent):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': user_agent})
 
@@ -32,17 +38,20 @@ class Freenom(object):
             return str(p)
         return None
 
-    def login(self, login: str, password: str, url: str = "https://my.freenom.com/dologin.php") -> bool:
+    def login(self, login: str, password: str, url: str = login_url) -> bool:
         token = self._get_login_token()
         payload = {'token': token,
                    'username': login,
                    'password': password}
+        host_name = urlparse(url).hostname
+        if host_name != parsed_base_url.hostname:
+            warnings.warn(f"Using another host than {parsed_base_url.hostname} is not tested")
         r = self.session.post(url, payload,
-                              headers={'Host': 'my.freenom.com', 'Referer': 'https://my.freenom.com/clientarea.php'})
+                              headers={'Host': host_name, 'Referer': f'https://{host_name}/clientarea.php'})
         r.raise_for_status()
         return self.is_logged_in(r)
 
-    def list_domains(self, url: str = 'https://my.freenom.com/clientarea.php?action=domains') -> List[Domain]:
+    def list_domains(self, url: str = list_domain_url) -> List[Domain]:
         token = self._get_domain_token()
         payload = {'token': token,
                    'itemlimit': 'all'}
@@ -119,7 +128,7 @@ class Freenom(object):
             raise UpdateError([e.text for e in errs], record, records)
         return len(soup.find_all(attrs={'class': 'dnssuccess'}))
 
-    def remove_record(self, record: Record, records: Optional[List[Record]] = None) -> bool:
+    def remove_record(self, record: Record, records: Optional[List[Record]] = None, url=client_area_url) -> bool:
         if records is None:
             records = self.list_records(record.domain)
         if not self.contains_record(record, records):
@@ -138,7 +147,6 @@ class Freenom(object):
             'port': None,
             'domainid': record.domain.id
         }
-        url = 'https://my.freenom.com/clientarea.php'
         r = self.session.get(url, params=payload)
         r.raise_for_status()
 
@@ -187,18 +195,18 @@ class Freenom(object):
 
     @staticmethod
     def manage_domain_url(domain: Domain):
-        return f"https://my.freenom.com/clientarea.php?managedns={domain.name}&domainid={domain.id}"
+        return f"{client_area_url}?managedns={quote(domain.name)}&domainid={quote(domain.id)}"
 
-    def is_logged_in(self, r: Optional[requests.Response] = None, url: str = "https://my.freenom.com/clientarea.php"):
+    def is_logged_in(self, r: Optional[requests.Response] = None, url: str = client_area_url):
         if r is None:
             r = self.session.get(url)
             r.raise_for_status()
         return '<section class="greeting">' in r.text
 
-    def _get_login_token(self, url: str = "https://my.freenom.com/clientarea.php"):
+    def _get_login_token(self, url: str = client_area_url):
         return self._get_token(url)
 
-    def _get_domain_token(self, url: str = 'https://my.freenom.com/clientarea.php?action=domains'):
+    def _get_domain_token(self, url: str = list_domain_url):
         return self._get_token(url)
 
     def _get_manage_domain_token(self, url: str):
