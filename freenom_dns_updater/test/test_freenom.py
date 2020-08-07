@@ -1,6 +1,7 @@
 import pathlib
 import random
 import unittest
+from copy import copy
 from pprint import pprint
 
 import datetime
@@ -20,7 +21,7 @@ Temporary export your login password as the following env variables: FREENOM_LOG
 then write your testing domain id and name as env variables : FREENOM_TEST_DOMAIN_ID and FREENOM_TEST_DOMAIN_NAME
 '''
 
-TEST_DOMAIN_ID = int(os.getenv("FREENOM_TEST_DOMAIN_ID", 1027889227))
+TEST_DOMAIN_ID = int(os.getenv("FREENOM_TEST_DOMAIN_ID", 1096252459))
 TEST_DOMAIN_NAME = str(os.getenv("FREENOM_TEST_DOMAIN_NAME", 'freenom-dns-updater.tk'))
 
 
@@ -28,6 +29,7 @@ class FreenomTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(FreenomTest, self).__init__(*args, **kwargs)
         self.config_file = self.find_config_file("freenom.yml")
+        self.freenom = None
 
     def setUp(self):
         self.freenom = Freenom()
@@ -39,6 +41,10 @@ class FreenomTest(unittest.TestCase):
             self.config = None
             self.login = os.getenv("FREENOM_LOGIN", None)
             self.password = os.getenv("FREENOM_PASSWORD", None)
+
+    def tearDown(self):
+        del self.freenom
+
 
     @staticmethod
     def find_config_file(name):
@@ -144,6 +150,7 @@ class FreenomTest(unittest.TestCase):
 
         self.test_login()
         self.add_record_if_missing(record)
+        original_record = copy(record)
         records_before = self.freenom.list_records(domain)
         record.target = "185.45.193.%d" % random.randint(1000, 3500)
         try:
@@ -156,7 +163,10 @@ class FreenomTest(unittest.TestCase):
         else:
             self.fail("exception %s expected " % UpdateError.__name__)
         finally:
-            self.freenom.remove_record(record)
+            try:
+                self.freenom.remove_record(record)
+            except UpdateError:
+                self.freenom.remove_record(original_record)
 
     def test_remove_record(self):
         domain = Domain()

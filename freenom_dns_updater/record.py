@@ -1,5 +1,4 @@
 from enum import Enum, unique
-import six
 
 from .domain import Domain
 
@@ -17,7 +16,7 @@ class RecordType(Enum):
 
 
 class Record(object):
-    def __init__(self, name='', type=RecordType.A, ttl=14440, target='', domain=None):
+    def __init__(self, name='', type=RecordType.A, ttl=14440, target: str = '', domain=None):
         self._name = None
         self._type = None
         self._ttl = None
@@ -29,7 +28,7 @@ class Record(object):
         self.domain = domain
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @name.setter
@@ -37,7 +36,7 @@ class Record(object):
         self._name = str(value).strip().upper()
 
     @property
-    def ttl(self):
+    def ttl(self) -> int:
         return self._ttl
 
     @ttl.setter
@@ -45,14 +44,14 @@ class Record(object):
         self._ttl = int(value)
 
     @property
-    def type(self):
+    def type(self) -> RecordType:
         return self._type
 
     @type.setter
     def type(self, value):
         if isinstance(value, RecordType):
             self._type = value
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             self._type = RecordType[value.strip().upper()]
         elif isinstance(value, int):
             self._type = RecordType(value)
@@ -60,7 +59,7 @@ class Record(object):
             raise ValueError("bad type")
 
     @property
-    def domain(self):
+    def domain(self) -> Domain:
         return self._domain
 
     @domain.setter
@@ -95,5 +94,3 @@ class Record(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
-

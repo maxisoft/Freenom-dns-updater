@@ -1,16 +1,16 @@
-import re
-
 import pathlib
-import requests
-from bs4 import BeautifulSoup, Tag
+import warnings
 from copy import copy
+from typing import Optional, List
 
-from .record import Record
+import requests
+from bs4 import BeautifulSoup
+
 from .domain import Domain
-from .exception import UpdateError, AddError, DnsRecordBaseException
 from .domain_parser import DomainParser
+from .exception import UpdateError, AddError
+from .record import Record
 from .record_parser import RecordParser
-
 
 default_user_agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"
 
@@ -20,32 +20,37 @@ class Freenom(object):
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': user_agent})
 
+    def __del__(self):
+        self.session.close()
+
     @staticmethod
     def findcert():
         p = pathlib.Path(__file__).parent
         p = (p / "data" / "chain.pem")
         if p.exists():
+            warnings.warn(f"Using custom chain.pem \"{p.absolute()}\"")
             return str(p)
         return None
 
-    def login(self, login, password, url="https://my.freenom.com/dologin.php"):
+    def login(self, login: str, password: str, url: str = "https://my.freenom.com/dologin.php") -> bool:
         token = self._get_login_token()
-        playload = {'token': token,
-                    'username': login,
-                    'password': password}
-        r = self.session.post(url, playload, headers={'Host': 'my.freenom.com', 'Referer': 'https://my.freenom.com/clientarea.php'})
+        payload = {'token': token,
+                   'username': login,
+                   'password': password}
+        r = self.session.post(url, payload,
+                              headers={'Host': 'my.freenom.com', 'Referer': 'https://my.freenom.com/clientarea.php'})
         r.raise_for_status()
         return self.is_logged_in(r)
 
-    def list_domains(self, url='https://my.freenom.com/clientarea.php?action=domains'):
+    def list_domains(self, url: str = 'https://my.freenom.com/clientarea.php?action=domains') -> List[Domain]:
         token = self._get_domain_token()
-        playload = {'token': token,
-                    'itemlimit': 'all'}
-        r = self.session.post(url, playload)
+        payload = {'token': token,
+                   'itemlimit': 'all'}
+        r = self.session.post(url, payload)
         r.raise_for_status()
         return DomainParser.parse(r.text)
 
-    def list_records(self, domain):
+    def list_records(self, domain: Domain):
         url = self.manage_domain_url(domain)
         r = self.session.get(url)
         r.raise_for_status()
@@ -54,7 +59,7 @@ class Freenom(object):
             records.domain = domain
         return ret
 
-    def add_record(self, record, upsert=True, records=None):
+    def add_record(self, record: Record, upsert: bool = True, records: Optional[List[Record]] = None):
         if records is None:
             records = self.list_records(record.domain)
         contains_record = self.contains_record(record, records)
@@ -66,31 +71,31 @@ class Freenom(object):
 
         url = self.manage_domain_url(record.domain)
         token = self._get_manage_domain_token(url)
-        playload = {
+        payload = {
             'dnsaction': 'add',
             'token': token
         }
         record_id = "addrecord[%d]" % 0
-        playload[record_id + "[name]"] = str(record.name)
-        playload[record_id + "[type]"] = record.type.name
-        playload[record_id + "[ttl]"] = str(record.ttl)
-        playload[record_id + "[value]"] = str(record.target)
-        playload[record_id + "[priority]"] = ""
-        playload[record_id + "[port]"] = ""
-        playload[record_id + "[weight]"] = ""
-        playload[record_id + "[forward_type]"] = "1"
+        payload[record_id + "[name]"] = str(record.name)
+        payload[record_id + "[type]"] = record.type.name
+        payload[record_id + "[ttl]"] = str(record.ttl)
+        payload[record_id + "[value]"] = str(record.target)
+        payload[record_id + "[priority]"] = ""
+        payload[record_id + "[port]"] = ""
+        payload[record_id + "[weight]"] = ""
+        payload[record_id + "[forward_type]"] = "1"
 
-        r = self.session.post(url, data=playload)
+        r = self.session.post(url, data=payload)
         soup = BeautifulSoup(r.text, "html.parser")
         errs = soup.find_all(attrs={'class': 'dnserror'})
         if errs:
             raise AddError([e.text for e in errs], record, records)
         return len(soup.find_all(attrs={'class': 'dnssuccess'}))
 
-    def update_record(self, record, records=None):
+    def update_record(self, record: Record, records: Optional[List[Record]] = None) -> int:
         url = self.manage_domain_url(record.domain)
         token = self._get_manage_domain_token(url)
-        playload = {
+        payload = {
             'dnsaction': 'modify',
             'token': token
         }
@@ -101,38 +106,55 @@ class Freenom(object):
             record_id = "records[%d]" % i
             if rec.name == record.name and rec.type == record.type:
                 rec = record
-            playload[record_id + "[line]"] = ""
-            playload[record_id + "[type]"] = rec.type.name
-            playload[record_id + "[name]"] = str(rec.name)
-            playload[record_id + "[ttl]"] = str(rec.ttl)
-            playload[record_id + "[value]"] = str(rec.target)
+            payload[record_id + "[line]"] = ""
+            payload[record_id + "[type]"] = rec.type.name
+            payload[record_id + "[name]"] = str(rec.name)
+            payload[record_id + "[ttl]"] = str(rec.ttl)
+            payload[record_id + "[value]"] = str(rec.target)
 
-        r = self.session.post(url, data=playload)
+        r = self.session.post(url, data=payload)
         soup = BeautifulSoup(r.text, "html.parser")
         errs = soup.find_all(attrs={'class': 'dnserror'})
         if errs:
             raise UpdateError([e.text for e in errs], record, records)
         return len(soup.find_all(attrs={'class': 'dnssuccess'}))
 
-    def remove_record(self, record, records=None):
+    def remove_record(self, record: Record, records: Optional[List[Record]] = None) -> bool:
         if records is None:
             records = self.list_records(record.domain)
         if not self.contains_record(record, records):
             return False
-        record = copy(record)
-        record.target = "-@^^ ac1a3!"  # somehow hacky, isn't ?
-        try:
-            self.update_record(record, records)
-        except UpdateError as e:
-            return len(e.msgs) == 1
-        return False
+        payload = {
+            'managedns': record.domain.name,
+            'page': None,
+            'records': record.type.name,
+            'dnsaction': 'delete',
+            'name': record.name,
+            'value': record.target,
+            'line': None,
+            'ttl': record.ttl,
+            'priority': None,
+            'weight': None,
+            'port': None,
+            'domainid': record.domain.id
+        }
+        url = 'https://my.freenom.com/clientarea.php'
+        r = self.session.get(url, params=payload)
+        r.raise_for_status()
 
-    def contains_domain(self, domain, domains=None):
+        soup = BeautifulSoup(r.text, "html.parser")
+        errs = soup.find_all(attrs={'class': 'dnserror'})
+        if errs:
+            raise UpdateError([e.text for e in errs], record, records)
+        assert len(soup.find_all(attrs={'class': 'dnssuccess'})) == 1
+        return True
+
+    def contains_domain(self, domain: Domain, domains=None):
         if domains is None:
             domains = self.list_domains()
         return any(domain.id == d.id and domain.name == d.name for d in domains)
 
-    def contains_record(self, record, records=None):
+    def contains_record(self, record, records: Optional[List[Record]] = None):
         if records is None:
             records = self.list_records(record.domain)
         return any(record.name == rec.name and record.type == rec.type for rec in records)
@@ -144,45 +166,45 @@ class Freenom(object):
             return self.contains_record(item)
         return False
 
-    def rollback_update(self, records):
+    def rollback_update(self, records: List[Record]):
         if not records:
             return False
         url = self.manage_domain_url(records[0].domain)
         token = self._get_manage_domain_token(url)
-        playload = {
+        payload = {
             'dnsaction': 'modify',
             'token': token
         }
         for i, rec in enumerate(records):
             record_id = "records[%d]" % i
-            playload[record_id + "[line]"] = ""
-            playload[record_id + "[type]"] = rec.type.name
-            playload[record_id + "[name]"] = str(rec.name)
-            playload[record_id + "[ttl]"] = str(rec.ttl)
-            playload[record_id + "[value]"] = str(rec.target)
+            payload[record_id + "[line]"] = ""
+            payload[record_id + "[type]"] = rec.type.name
+            payload[record_id + "[name]"] = str(rec.name)
+            payload[record_id + "[ttl]"] = str(rec.ttl)
+            payload[record_id + "[value]"] = str(rec.target)
 
-        return bool(self.session.post(url, data=playload))
+        return bool(self.session.post(url, data=payload))
 
     @staticmethod
-    def manage_domain_url(domain):
-        return "https://my.freenom.com/clientarea.php?managedns={0.name}&domainid={0.id}".format(domain)
+    def manage_domain_url(domain: Domain):
+        return f"https://my.freenom.com/clientarea.php?managedns={domain.name}&domainid={domain.id}"
 
-    def is_logged_in(self, r=None, url="https://my.freenom.com/clientarea.php"):
+    def is_logged_in(self, r: Optional[requests.Response] = None, url: str = "https://my.freenom.com/clientarea.php"):
         if r is None:
             r = self.session.get(url)
             r.raise_for_status()
         return '<section class="greeting">' in r.text
 
-    def _get_login_token(self, url="https://my.freenom.com/clientarea.php"):
+    def _get_login_token(self, url: str = "https://my.freenom.com/clientarea.php"):
         return self._get_token(url)
 
-    def _get_domain_token(self, url='https://my.freenom.com/clientarea.php?action=domains'):
+    def _get_domain_token(self, url: str = 'https://my.freenom.com/clientarea.php?action=domains'):
         return self._get_token(url)
 
-    def _get_manage_domain_token(self, url):
+    def _get_manage_domain_token(self, url: str):
         return self._get_token(url)
 
-    def _get_token(self, url):
+    def _get_token(self, url: str):
         r = self.session.get(url)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")

@@ -13,7 +13,7 @@ from .get_my_ip import *
 
 class Config(dict):
     def __init__(self, src="freenom.yml", **kwargs):
-        super(Config, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if isinstance(src, pathlib.Path):
             src = str(src)
         self.reload(src)
@@ -36,7 +36,7 @@ class Config(dict):
         file = file or self.file
         if isinstance(file, six.string_types):
             with open(file, 'w') as f:
-                yaml.dump(self, f)
+                yaml.dump(dict(self), f)
             return True
         return False
 

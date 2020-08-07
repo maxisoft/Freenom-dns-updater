@@ -9,8 +9,7 @@ from freenom_dns_updater.record_parser import RecordParser
 class DomainParserTest(unittest.TestCase):
     def test_parse_records(self):
         path = pathlib.Path(__file__).parent / "resources" / "record_page.html"
-        with path.open() as f:
-            html = f.read()
+        html = path.read_text()
         records = RecordParser.parse(html)
         self.assertEqual(2, len(records))
         expected = Record()
