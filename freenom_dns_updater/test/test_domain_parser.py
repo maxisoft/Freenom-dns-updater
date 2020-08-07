@@ -14,7 +14,7 @@ class DomainParserTest(unittest.TestCase):
         domains = DomainParser.parse(html)
         self.assertEqual(2, len(domains))
         expected = Domain()
-        expected.id = "1065251102"
+        expected.id = 1065251102
         expected.name = "domain.tk"
         expected.register_date = datetime.date(year=2016, month=2, day=9)
         expected.expire_date = datetime.date(year=2017, month=2, day=9)
