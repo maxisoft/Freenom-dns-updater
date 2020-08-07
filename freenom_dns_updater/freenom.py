@@ -34,7 +34,7 @@ class Freenom(object):
                     'username': login,
                     'password': password}
         r = self.session.post(url, playload, headers={'Host': 'my.freenom.com', 'Referer': 'https://my.freenom.com/clientarea.php'})
-        assert r, "couldn't get %s" % url
+        r.raise_for_status()
         return self.is_logged_in(r)
 
     def list_domains(self, url='https://my.freenom.com/clientarea.php?action=domains'):
@@ -42,13 +42,13 @@ class Freenom(object):
         playload = {'token': token,
                     'itemlimit': 'all'}
         r = self.session.post(url, playload)
-        assert r, "couldn't get %s" % url
+        r.raise_for_status()
         return DomainParser.parse(r.text)
 
     def list_records(self, domain):
         url = self.manage_domain_url(domain)
         r = self.session.get(url)
-        assert r, "couldn't get %s" % url
+        r.raise_for_status()
         ret = RecordParser.parse(r.text)
         for records in ret:
             records.domain = domain
@@ -170,7 +170,7 @@ class Freenom(object):
     def is_logged_in(self, r=None, url="https://my.freenom.com/clientarea.php"):
         if r is None:
             r = self.session.get(url)
-            assert r, "couldn't get %s" % url
+            r.raise_for_status()
         return '<section class="greeting">' in r.text
 
     def _get_login_token(self, url="https://my.freenom.com/clientarea.php"):
@@ -184,7 +184,7 @@ class Freenom(object):
 
     def _get_token(self, url):
         r = self.session.get(url)
-        assert r, "couldn't get %s" % url
+        r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         token = soup.find("input", {'name': 'token'})
         assert token and token['value'], "there's no token on this page"
