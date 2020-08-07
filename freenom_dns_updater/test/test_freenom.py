@@ -149,10 +149,10 @@ class FreenomTest(unittest.TestCase):
         record.ttl = 14440
 
         self.test_login()
-        self.add_record_if_missing(record)
+        cleanup = self.add_record_if_missing(record)
         original_record = copy(record)
         records_before = self.freenom.list_records(domain)
-        record.target = "185.45.193.%d" % random.randint(1000, 3500)
+        record.target = "185.45.193.%d" % random.randint(1000, 3500)  # this is an invalid ip address
         try:
             self.freenom.update_record(record)
         except UpdateError as e:
@@ -163,9 +163,7 @@ class FreenomTest(unittest.TestCase):
         else:
             self.fail("exception %s expected " % UpdateError.__name__)
         finally:
-            try:
-                self.freenom.remove_record(record)
-            except UpdateError:
+            if cleanup:
                 self.freenom.remove_record(original_record)
 
     def test_remove_record(self):
@@ -187,9 +185,11 @@ class FreenomTest(unittest.TestCase):
         self.assertTrue(res)
         self.assertNotIn(record, self.freenom.list_records(domain))
 
-    def add_record_if_missing(self, record):
+    def add_record_if_missing(self, record) -> bool:
         if record not in self.freenom:
             self.freenom.add_record(record)
+            return True
+        return False
 
     def remove_record_if_exists(self, record):
         if record in self.freenom:
