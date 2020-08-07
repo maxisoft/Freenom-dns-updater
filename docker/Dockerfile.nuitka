@@ -1,0 +1,18 @@
+FROM python:3-alpine as builder
+RUN apk add build-base wget unzip
+RUN mkdir -p '/opt/freenom_dns_updater'
+COPY . /opt/freenom_dns_updater/tmp
+WORKDIR /opt/freenom_dns_updater/tmp
+RUN wget http://nuitka.net/releases/Nuitka-0.6.9rc6.zip -O /tmp/Nuitka.zip
+RUN cd /tmp && unzip Nuitka.zip && rm -f Nuitka.zip
+RUN cd /tmp/Nuitka* && python3 setup.py install
+RUN python3 -m pip install --no-cache-dir /opt/freenom_dns_updater/tmp/dist/freenom*.whl
+RUN python3 -m pip uninstall -y freenom-dns-updater
+RUN python3 -m nuitka --standalone --show-progress --plugin-enable=multiprocessing --follow-imports freenom_dns_updater/scripts/fdu.py
+
+
+FROM python:3-alpine
+LABEL Description="This image is used to start freenom dns updater" Version="1.0"
+COPY --from=builder /opt/freenom_dns_updater/tmp/fdu.bin /usr/bin/fdu
+RUN ls -lah /opt
+CMD fdu process -i -c -t 3600 /etc/freenom.yml

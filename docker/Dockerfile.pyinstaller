@@ -1,0 +1,19 @@
+FROM python:3-alpine as builder
+RUN apk add build-base wget unzip python3-dev openssl-dev alpine-sdk zlib-dev
+RUN apk add upx || : # upx is optional for pyinstaller and not available on every arch
+RUN mkdir -p '/opt/freenom_dns_updater'
+COPY . /opt/freenom_dns_updater/tmp
+WORKDIR /opt/freenom_dns_updater/tmp
+RUN python3 -m pip install --no-cache-dir /opt/freenom_dns_updater/tmp/dist/freenom*.whl
+RUN python3 -m pip install --no-cache-dir pyinstaller
+RUN python3 -m pip uninstall -y freenom-dns-updater
+RUN python3 -O -m PyInstaller -y --clean --strip --console freenom_dns_updater/scripts/fdu.py
+RUN ls -lah dist/fdu
+
+
+FROM alpine
+LABEL Description="This image is used to start freenom dns updater" Version="1.0"
+COPY --from=builder /opt/freenom_dns_updater/tmp/dist/fdu /opt/freenom_dns_updater
+RUN ls -lah /opt/freenom_dns_updater
+ENTRYPOINT [ "/opt/freenom_dns_updater/fdu" ]
+CMD [ "process", "-i", "-c", "-t", "3600", "/etc/freenom.yml" ]

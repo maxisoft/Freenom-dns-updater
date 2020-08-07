@@ -1,0 +1,96 @@
+name: Build docker image
+
+on:
+  push:
+    branches: [ main, dev, docker ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+      
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Setup pip cache
+      uses: actions/cache@v2
+      timeout-minutes: 5
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install deps
+      run: |
+            pip install -r test-requirements.txt &&
+            pip install -e . &&
+            pip install wheel
+      timeout-minutes: 3
+
+    - name: Build the wheel
+      run: python setup.py bdist_wheel
+
+    - name: Build Dockerfile
+      timeout-minutes: 20
+      run: |
+            docker build -t fdu_testing -f ./docker/Dockerfile .
+
+    - name: Run Dive
+      timeout-minutes: 2
+      run: |
+            pushd /tmp
+            wget --no-verbose https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
+            sudo apt install --quiet -y ./dive_0.9.2_linux_amd64.deb
+            popd
+            CI=true dive --ci-config "${{ github.workspace }}/.dive-ci" fdu_testing
+
+    - name: Build Dockerfile (PyInstaller)
+      timeout-minutes: 10
+      run: |
+            docker build -t fdu_testing -f ./docker/Dockerfile.pyinstaller .
+
+    - name: Run Dive
+      timeout-minutes: 2
+      run: |
+            CI=true dive --ci-config "${{ github.workspace }}/.dive-ci" fdu_testing
+        
+    - 
+      name: Set up Docker Buildx
+      id: buildx
+      uses: crazy-max/ghaction-docker-buildx@v3
+      timeout-minutes: 10
+      with:
+        buildx-version: latest
+        qemu-version: latest
+
+    - name: Lock using Turnstyle
+      timeout-minutes: 15
+      uses: softprops/turnstyle@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    -
+      name: Docker Login
+      timeout-minutes: 1
+      run: |
+            echo '${{ secrets.DOCKERIO_PASSWORD }}' | docker login --username "maxisoft" --password-stdin
+
+    - 
+      name: Build dockerfile (with push)
+      if: success() && github.ref == 'refs/heads/docker'
+      timeout-minutes: 90
+      run: |
+            set -x
+            docker buildx build \
+            --platform=linux/amd64,linux/386,linux/arm/v7,linux/arm64/v8,linux/arm/v6 \
+            --output "type=image,push=true" \
+            --file docker/Dockerfile.pyinstaller . \
+            --tag maxisoft/freenom-dns-updater-testing:latest \
+            --tag maxisoft/freenom-dns-updater-testing:pyinstaller
+
