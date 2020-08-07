@@ -191,9 +191,12 @@ class FreenomTest(unittest.TestCase):
             return True
         return False
 
-    def remove_record_if_exists(self, record):
-        if record in self.freenom:
-            self.freenom.remove_record(record)
+    def remove_record_if_exists(self, record) -> bool:
+        saved = self.freenom.get_matching_record(record)
+        if saved is not None:
+            self.freenom.remove_record(saved)
+            return True
+        return False
 
     def skipIfNoLogin(self):
         if self.login is None and self.password is None:

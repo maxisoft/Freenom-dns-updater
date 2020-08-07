@@ -157,15 +157,21 @@ class Freenom(object):
         assert len(soup.find_all(attrs={'class': 'dnssuccess'})) == 1
         return True
 
-    def contains_domain(self, domain: Domain, domains=None):
+    def get_matching_domain(self, domain: Domain, domains=None) -> Optional[Domain]:
         if domains is None:
             domains = self.list_domains()
-        return any(domain.id == d.id and domain.name == d.name for d in domains)
+        return next((d for d in domains if domain.id == d.id and domain.name == d.name), None)
 
-    def contains_record(self, record, records: Optional[List[Record]] = None):
+    def contains_domain(self, domain: Domain, domains=None):
+        return self.get_matching_domain(domain, domains) is not None
+
+    def get_matching_record(self, record, records: Optional[List[Record]] = None) -> Optional[Record]:
         if records is None:
             records = self.list_records(record.domain)
-        return any(record.name == rec.name and record.type == rec.type for rec in records)
+        return next((rec for rec in records if record.name == rec.name and record.type == rec.type), None)
+
+    def contains_record(self, record, records: Optional[List[Record]] = None):
+        return self.get_matching_record(record, records) is not None
 
     def __contains__(self, item):
         if isinstance(item, Domain):
