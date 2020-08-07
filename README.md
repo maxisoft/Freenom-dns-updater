@@ -1,9 +1,3 @@
-### A note from _bitteruhe_
-This is a fork of [maxisoft](https://github.com/maxisoft/)'s (apparently abandoned) [project](https://github.com/maxisoft/Freenom-dns-updater).  
-This fork became necessary when an [issue with freenom's login form](https://github.com/maxisoft/Freenom-dns-updater/issues/11) was found and never fixed. The fork fixes this issue with the help of a [solution](https://github.com/maxisoft/Freenom-dns-updater/issues/11#issuecomment-345633463) found by [Shihira](https://github.com/shihira).
-
-----
-
 # Freenom dns updater
 A tool written in python to update [freenom](http://Freenom.com)'s dns records
 
