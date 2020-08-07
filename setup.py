@@ -56,10 +56,8 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.8',
     ],
 
     # What does your project relate to?
@@ -68,6 +66,8 @@ setup(
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=find_packages(exclude=['freenom_dns_updater.test.*']),
+
+    python_requires='~=3.6',
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
