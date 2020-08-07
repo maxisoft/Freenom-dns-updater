@@ -1,0 +1,41 @@
+name: Test dev and main branch
+
+on:
+  push:
+    branches: [ main, dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+      
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install deps
+      run: |
+            pip install -r test-requirements.txt &&
+            pip install -e .
+      timeout-minutes: 3
+
+
+    - name: Setup login creds
+      run: |
+            echo "::set-env name=FREENOM_LOGIN::${{ secrets.FREENOM_LOGIN }}"
+            echo "::set-env name=FREENOM_PASSWORD::${{ secrets.FREENOM_PASSWORD }}"
+
+    - name: Lock using Turnstyle
+      timeout-minutes: 15
+      uses: softprops/turnstyle@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: Run python unit/integration tests
+      run: python -m unittest discover -s ./freenom_dns_updater/test
+      timeout-minutes: 20
+     
