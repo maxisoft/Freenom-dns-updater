@@ -1,9 +1,8 @@
 import datetime
-import pathlib
 import time
 import warnings
 from typing import Optional, List
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, quote
 
 import requests
 from bs4 import BeautifulSoup
@@ -11,6 +10,7 @@ from bs4 import BeautifulSoup
 from .domain import Domain
 from .domain_parser import DomainParser
 from .exception import UpdateError, AddError
+from .freenom_session import FreenomSession
 from .record import Record
 from .record_parser import RecordParser
 
@@ -25,8 +25,8 @@ LIST_DOMAIN_URL = f'{CLIENT_AREA_URL}?action=domains'
 
 class Freenom(object):
     def __init__(self, user_agent: str = DEFAULT_USER_AGENT):
-        self.session = requests.Session()
-        self.session.headers.update({'User-Agent': user_agent})
+        self.session: requests.Session = FreenomSession()
+        self.session.headers.update({'User-Agent': user_agent, "Accept-Language": "en-US,en;q=0.5"})
 
     def __del__(self):
         self.session.close()
@@ -40,7 +40,6 @@ class Freenom(object):
         host_name = urlparse(url).hostname
         if host_name != PARSED_FREENOM_BASE_URL.hostname:
             warnings.warn(f"Using another host than {PARSED_FREENOM_BASE_URL.hostname} is not tested")
-        time.sleep(1)
         r = self.session.post(url, payload,
                               headers={'Host': host_name, 'Referer': f'https://{host_name}/clientarea.php'})
         r.raise_for_status()
@@ -48,16 +47,13 @@ class Freenom(object):
 
     def list_domains(self, url: str = LIST_DOMAIN_URL) -> List[Domain]:
         token = self._get_domain_token()
-        payload = {'token': token,
-                   'itemlimit': 'all'}
-        time.sleep(1)
+        payload = {'token': token, 'itemlimit': 'all'}
         r = self.session.post(url, payload)
         r.raise_for_status()
         return DomainParser.parse(r.text)
 
     def list_records(self, domain: Domain):
         url = self.manage_domain_url(domain)
-        time.sleep(1)
         r = self.session.get(url)
         r.raise_for_status()
         ret = RecordParser.parse(r.text)
@@ -91,7 +87,6 @@ class Freenom(object):
         payload[record_id + "[weight]"] = ""
         payload[record_id + "[forward_type]"] = "1"
 
-        time.sleep(1)
         r = self.session.post(url, data=payload)
         soup = BeautifulSoup(r.text, "html.parser")
         errs = soup.find_all(attrs={'class': 'dnserror'})
@@ -119,7 +114,6 @@ class Freenom(object):
             payload[record_id + "[ttl]"] = str(rec.ttl)
             payload[record_id + "[value]"] = str(rec.target)
 
-        time.sleep(1)
         r = self.session.post(url, data=payload)
         soup = BeautifulSoup(r.text, "html.parser")
         errs = soup.find_all(attrs={'class': 'dnserror'})
@@ -196,28 +190,27 @@ class Freenom(object):
             payload[record_id + "[ttl]"] = str(rec.ttl)
             payload[record_id + "[value]"] = str(rec.target)
 
-        time.sleep(1)
         return bool(self.session.post(url, data=payload))
 
     @staticmethod
     def manage_domain_url(domain: Domain):
-        return FREENOM_BASE_URL + "/clientarea.php?managedns={0.name}&domainid={0.id}".format(domain)
+        return urljoin(FREENOM_BASE_URL, f"clientarea.php?managedns={quote(domain.name)}&domainid={quote(domain.id)}")
 
     def need_renew(self, domain):
         return domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=14)
 
-    def renew(self, domain, period="12M", url=FREENOM_BASE_URL + '/domains.php?submitrenewals=true'):
+    def renew(self, domain, period: int = 12, url=FREENOM_BASE_URL + '/domains.php?submitrenewals=true'):
+        if period not in range(1, 13):
+            raise ValueError("period not in (1, 12)")
         if self.need_renew(domain):
             # keep this request to simulate humain usage and get token
             token = self._get_renew_token(domain)
             payload = {'token': token,
-                       'renewalid': "{0.id}".format(domain),
-                       'renewalperiod[{0.id}]'.format(domain): period,
+                       'renewalid': f"{domain.id}",
+                       f'renewalperiod[{domain.id}]': f"{period}M",
                        'paymentmethod': 'credit'
                        }
-            headers = {'Host': 'my.freenom.com',
-                       'Referer': FREENOM_BASE_URL + "/domains.php?a=renewdomain&domain={0.id}".format(domain)}
-            time.sleep(1)
+            headers = {'Referer': urljoin(FREENOM_BASE_URL, f"domains.php?a=renewdomain&domain={quote(domain.id)}")}
             r = self.session.post(url, payload, headers=headers)
             r.raise_for_status()
             return 'Order Confirmation' in r.text
@@ -226,7 +219,7 @@ class Freenom(object):
     def set_nameserver(self, domain, ns):
         if domain is None:
             return False
-        url = FREENOM_BASE_URL + '/clientarea.php?action=domaindetails&id={0.id}'.format(domain)
+        url = urljoin(FREENOM_BASE_URL, f'clientarea.php?action=domaindetails&id={quote(domain.id)}')
         i = 1
         token = self._get_set_ns_token(domain)
         params = {
@@ -236,23 +229,18 @@ class Freenom(object):
             'nschoice': 'custom'
         }
         for e in ns:
-            params['ns' + str(i)] = e
+            params[f'ns{i}'] = e
             i += 1
         while i <= 5:
-            params['ns' + str(i)] = ''
+            params[f'ns{i}'] = ''
             i += 1
-        headers = {
-            'Host': 'my.freenom.com',
-            'Referer': url
-        }
-        time.sleep(1)
+        headers = {'Referer': url}
         r = self.session.post(url, params, headers=headers)
         r.raise_for_status()
         return 'Changes Saved Successfully!' in r.text
 
     def is_logged_in(self, r: Optional[requests.Response] = None, url: str = CLIENT_AREA_URL):
         if r is None:
-            time.sleep(1)
             r = self.session.get(url)
             r.raise_for_status()
         return '<section class="greeting">' in r.text
@@ -273,7 +261,6 @@ class Freenom(object):
         return self._get_token(url.format(domain))
 
     def _get_token(self, url: str):
-        time.sleep(1)
         r = self.session.get(url)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
