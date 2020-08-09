@@ -4,10 +4,13 @@ import json
 import pathlib
 import platform
 import pprint
+import subprocess
 import sys
 import time
 import traceback
+import warnings
 from multiprocessing import Process
+from typing import Callable, Optional
 
 import click
 import requests
@@ -15,18 +18,13 @@ import six
 import yaml
 
 import freenom_dns_updater
+from freenom_dns_updater import Freenom, Record, Domain, Config
 from freenom_dns_updater.exception import UpdateError
 from freenom_dns_updater.get_my_ip import *
 
 is_windows = any(platform.win32_ver())
 
-if six.PY2:
-    try:
-        from urlparse import urlparse
-    except ImportError:
-        raise
-else:
-    from urllib.parse import urlparse
+from urllib.parse import urlparse
 
 _format_map = {
     None: lambda x: x,
@@ -93,7 +91,7 @@ def record_ls(user, password, domain, format):
             domain = d
             break
     if not isinstance(domain, freenom_dns_updater.Domain):
-        click.secho("You don't own the domain \"{}\"".format(domain), fg='yellow', bold=True)
+        click.secho(f"You don't own the domain \"{domain}\"", fg='yellow', bold=True)
         sys.exit(7)
     records = freenom.list_records(domain)
     click.echo(format_data(records, format))
@@ -126,7 +124,7 @@ def record_add(user, password, domain, name, type, target, ttl, update):
     ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, update), config, False)
 
     if ok_count:
-        click.echo('Record successfully added{}.'.format("/updated" if update else ""))
+        click.echo(f'Record successfully added{"/updated" if update else ""}.')
     else:
         click.secho('No record updated', fg='yellow', bold=True)
 
@@ -161,8 +159,8 @@ def record_update(user, password, domain, name, type, target, ttl):
         if ok_count:
             click.echo('Record successfully added/updated')
     except UpdateError as update_error:
-        if all(msg != 'There were no changes' for msg in update_error.msgs):
-            click.echo("Update errors: %s" % update_error.msgs, err=True)
+        if any(msg != 'There were no changes' for msg in update_error.msgs):
+            click.echo(f"Update errors: {update_error.msgs}", err=True)
     except Exception as e:
         click.echo("Error while updating: %s" % e, err=True)
 
@@ -210,11 +208,38 @@ def _update(config, ignore_errors):
         ok_count, err_count = record_action(lambda freenom, rec: freenom.add_record(rec, True), config, ignore_errors)
 
         if not err_count:
-            click.echo('Successfully Updated {} record{}'.format(ok_count, "s" if ok_count > 1 else ""))
+            click.echo(f'Successfully Updated {ok_count} record{"s" if ok_count > 1 else ""}')
         else:
-            click.echo('Updated {} record{}'.format(ok_count, "s" if ok_count > 1 else ""))
+            click.echo(f'Updated {ok_count} record{"s" if ok_count > 1 else ""}')
     except UpdateError as update_error:
-        if all(msg != 'There were no changes' for msg in update_error.msgs):
+        if any(msg != 'There were no changes' for msg in update_error.msgs):
+            click.echo("Update errors: %s" % update_error.msgs, err=True)
+    except Exception as e:
+        click.echo("Error while updating: %s" % e, err=True)
+
+    if not ok_count:
+        click.secho('No record updated', fg='yellow', bold=True)
+
+
+def _renew(config, ignore_errors):
+    config = freenom_dns_updater.Config(config_src(config))
+
+    ok_count = 0
+
+    def action(freenom: Freenom, domain: Domain):
+        if freenom.need_renew(domain):
+            if not freenom.renew(domain):
+                raise Exception(f"unable to renew {domain.name}")
+
+    try:
+        ok_count, err_count = domain_action(action, config, ignore_errors)
+
+        if not err_count:
+            click.echo(f'Successfully Updated {ok_count} domain{"s" if ok_count > 1 else ""}')
+        else:
+            click.echo(f'Updated {ok_count} domain{"s" if ok_count > 1 else ""}')
+    except UpdateError as update_error:
+        if any(msg != 'There were no changes' for msg in update_error.msgs):
             click.echo("Update errors: %s" % update_error.msgs, err=True)
     except Exception as e:
         click.echo("Error while updating: %s" % e, err=True)
@@ -230,7 +255,7 @@ def config_src(config):
     else:  # except a file
         ret = pathlib.Path(config)
         if not ret.is_file():
-            click.secho('File "{}" not found.'.format(ret), fg='red', bold=True)
+            click.secho(f'File "{ret}" not found.', fg='red', bold=True)
             sys.exit(5)
     return ret
 
@@ -243,11 +268,11 @@ def update(config, ignore_errors):
     return _update(config, ignore_errors)
 
 
-def record_action(action, config, ignore_errors):
+def record_action(action: Callable[[Freenom, Record], None], config: Config, ignore_errors: bool):
     records = config.records
     if not records:
         click.secho('There is no record configured', fg='yellow', bold=True)
-    freenom = freenom_dns_updater.Freenom()
+    freenom = Freenom()
     if not freenom.login(config.login, config.password):
         click.secho('Unable to login with the given credential', fg='red', bold=True)
         sys.exit(6)
@@ -259,7 +284,7 @@ def record_action(action, config, ignore_errors):
         domain_name = rec.domain.name
         rec.domain = domains_mapping.get(domain_name)
         if rec.domain is None:
-            click.secho("You don't own the domain \"{}\"".format(domain_name), fg='yellow', bold=True)
+            click.secho(f"You don't own the domain \"{domain_name}\"", fg='yellow', bold=True)
             if ignore_errors:
                 continue
             else:
@@ -269,7 +294,44 @@ def record_action(action, config, ignore_errors):
         except Exception as e:
             if not ignore_errors:
                 raise
-            # TODO log e
+            warnings.warn(traceback.format_exc())
+            err_count += 1
+        else:
+            ok_count += 1
+    return ok_count, err_count
+
+
+def domain_action(action: Callable[[Freenom, Domain], None], config: Config, ignore_errors: bool):
+    records = config.records
+    if not records:
+        click.secho('There is no record configured', fg='yellow', bold=True)
+    freenom = Freenom()
+    if not freenom.login(config.login, config.password):
+        click.secho('Unable to login with the given credential', fg='red', bold=True)
+        sys.exit(6)
+    domains = freenom.list_domains()
+    domains_mapping = {d.name: d for d in domains}
+    ok_count = 0
+    err_count = 0
+    to_process = set()
+    for rec in records:
+        domain_name = rec.domain.name
+        rec.domain = domains_mapping.get(domain_name)
+        if rec.domain is None:
+            click.secho(f"You don't own the domain \"{domain_name}\"", fg='yellow', bold=True)
+            if ignore_errors:
+                continue
+            else:
+                sys.exit(7)
+        to_process.add(rec.domain)
+
+    for domain in to_process:
+        try:
+            action(freenom, domain)
+        except Exception as e:
+            if not ignore_errors:
+                raise
+            warnings.warn(traceback.format_exc())
             err_count += 1
         else:
             ok_count += 1
@@ -282,13 +344,39 @@ def record_action(action, config, ignore_errors):
 @click.option('-f', '--format', help='Output format', default='TEXT', type=click.Choice(("TEXT", "JSON", "YAML")))
 @click.help_option('--help', '-h')
 def domain_ls(user, password, format):
-    freenom = freenom_dns_updater.Freenom()
+    freenom = Freenom()
+    if not freenom.login(user, password):
+        click.secho('Unable to login with the given credential', fg='red', bold=True)
+        sys.exit(6)
+    domains = freenom.list_domains()
+    click.echo(format_data(domains, format))
+
+
+@domain.command('renew', help='Renew a domain for X months')
+@click.argument('user')
+@click.argument('password')
+@click.argument('domain')
+@click.option('-p', '--period', help='number of months', type=click.IntRange(1, 12))
+@click.help_option('--help', '-h')
+def domain_renew(user, password, domain, period):
+    freenom = Freenom()
     if not freenom.login(user, password):
         click.secho('Unable to login with the given credential', fg='red', bold=True)
         sys.exit(6)
     # search the domain
     domains = freenom.list_domains()
-    click.echo(format_data(domains, format))
+    domain_obj = next((d for d in domains if d.name.upper() == domain.upper()), None)
+    if domain_obj is None:
+        click.secho(f'Unable to find domain with name "{domain}"', fg='red', bold=True)
+        sys.exit(6)
+    if not freenom.need_renew(domain_obj):
+        click.secho(f'No need to renew domain "{domain_obj.name}"', fg='yellow', bold=True)
+        sys.exit(7)
+    if freenom.renew(domain_obj, period):
+        click.echo(f'Renewed "{domain_obj.name}" for {period} months')
+    else:
+        click.secho(f'Unable to renew domain "{domain_obj.name}"', fg='red', bold=True)
+        sys.exit(6)
 
 
 @cli.command(help='''Regularly update records according to a configuration file''')
@@ -296,11 +384,13 @@ def domain_ls(user, password, format):
 @click.option('-t', '--period', default=60 * 60, help='update period in second', type=click.IntRange(10, 2592000))
 @click.option('-i', '--ignore-errors', help='ignore errors when updating', is_flag=True)
 @click.option('-c', '--cache', help='cache ip and update only if there is any changes', is_flag=True)
+@click.option('-r', '--renew', help='renew domain if needed', is_flag=True)
 @click.help_option('--help', '-h')
-def process(config, period, ignore_errors, cache):
+def process(config, period, ignore_errors, cache, renew):
     config_src(config)
     ipv4 = ''
     ipv6 = ''
+    last_renew_date: Optional[datetime.date] = None
     while 1:
         try:
             new_ipv4 = ''
@@ -310,20 +400,40 @@ def process(config, period, ignore_errors, cache):
                 try:
                     new_ipv4 = str(get_my_ipv4())
                 except:
-                    pass
+                    warnings.warn(traceback.format_exc())
                 try:
                     new_ipv6 = str(get_my_ipv6())
-                except:
+                except OSError:
                     pass
+                except requests.exceptions.ConnectionError:
+                    pass
+                except:
+                    warnings.warn(traceback.format_exc())
                 update_needed = ipv4 != new_ipv4 or ipv6 != new_ipv6
 
-            if update_needed:
-                p = Process(target=_update, args=(config, ignore_errors))
+            def start_and_wait_sub_process(target) -> Optional[int]:
+                p = Process(target=target, args=(config, ignore_errors))
                 p.start()
-                p.join(500)
+                exit_code = None
+                try:
+                    p.join(500)
+                    exit_code = p.exitcode
+                except subprocess.TimeoutExpired:
+                    p.kill()
+                    raise
+                finally:
+                    p.close()
+                return exit_code
+
+            if update_needed:
+                start_and_wait_sub_process(_update)
                 if cache:
                     ipv4 = new_ipv4
                     ipv6 = new_ipv6
+
+            if renew and last_renew_date != datetime.date.today():
+                if start_and_wait_sub_process(_renew) == 0:
+                    last_renew_date = datetime.date.today()
         except:
             traceback.print_exc(file=sys.stderr)
         finally:
