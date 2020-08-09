@@ -1,14 +1,14 @@
-import pathlib
-
-import yaml
-import six
 import ipaddress
-
-from .record import Record, RecordType
-from .domain import Domain
+import pathlib
 from copy import copy
+from typing import List
 
+import six
+import yaml
+
+from .domain import Domain
 from .get_my_ip import *
+from .record import Record, RecordType
 
 
 class Config(dict):
@@ -49,7 +49,7 @@ class Config(dict):
         return self['password']
 
     @property
-    def records(self):
+    def records(self) -> List[Record]:
         if self._records is not None:
             return self._records
 
@@ -70,7 +70,7 @@ class Config(dict):
         self._records = ret
         return ret
 
-    def _parse_record(self, raw_record, ipv4, ipv6):
+    def _parse_record(self, raw_record, ipv4, ipv6) -> List[Record]:
         assert isinstance(raw_record, dict)
         domain_name = raw_record['domain']
         assert isinstance(domain_name, six.string_types)

@@ -1,4 +1,5 @@
 from enum import Enum, unique
+from typing import Optional
 
 from .domain import Domain
 
@@ -59,7 +60,7 @@ class Record(object):
             raise ValueError("bad type")
 
     @property
-    def domain(self) -> Domain:
+    def domain(self) -> Optional[Domain]:
         return self._domain
 
     @domain.setter
