@@ -65,9 +65,11 @@ class FreenomTest(unittest.TestCase):
         self.assertTrue(self.freenom.login(self.login, self.password))
 
     def test_login_fail(self):
+        self.skipIfNoLogin()
         self.assertFalse(self.freenom.login("", ""))
 
     def test__get_token(self):
+        self.skipIfNoLogin()
         result = self.freenom._get_login_token()
         self.assertIsInstance(result, six.string_types)
         self.assertTrue(result)
@@ -79,6 +81,7 @@ class FreenomTest(unittest.TestCase):
                               self.freenom._get_login_token, "http://httpbin.org/html")
 
     def test_is_logged_in(self):
+        self.skipIfNoLogin()
         self.assertFalse(self.freenom.is_logged_in())
         self.test_login()
         self.assertTrue(self.freenom.is_logged_in())
@@ -199,8 +202,8 @@ class FreenomTest(unittest.TestCase):
         return False
 
     def skipIfNoLogin(self):
-        if self.login is None and self.password is None:
-            self.skipTest("login and password are not set")
+        if self.login is None or self.password is None:
+            self.skipTest("login or password not set")
 
 
 if __name__ == '__main__':
