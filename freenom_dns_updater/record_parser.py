@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 
-from .record import Record, RecordType
+from .record import Record
 
 
 class RecordParser(object):

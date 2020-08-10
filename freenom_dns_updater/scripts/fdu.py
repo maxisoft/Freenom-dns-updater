@@ -16,15 +16,15 @@ import click
 import requests
 import six
 import yaml
+from urllib.parse import urlparse
 
 import freenom_dns_updater
 from freenom_dns_updater import Freenom, Record, Domain, Config
 from freenom_dns_updater.exception import UpdateError
-from freenom_dns_updater.get_my_ip import *
+from freenom_dns_updater.get_my_ip import get_my_ipv4, get_my_ipv6
 
 is_windows = any(platform.win32_ver())
 
-from urllib.parse import urlparse
 
 _format_map = {
     None: lambda x: x,
@@ -291,7 +291,7 @@ def record_action(action: Callable[[Freenom, Record], None], config: Config, ign
                 sys.exit(7)
         try:
             action(freenom, rec)
-        except Exception as e:
+        except Exception:
             if not ignore_errors:
                 raise
             warnings.warn(traceback.format_exc())
@@ -328,7 +328,7 @@ def domain_action(action: Callable[[Freenom, Domain], None], config: Config, ign
     for domain in to_process:
         try:
             action(freenom, domain)
-        except Exception as e:
+        except Exception:
             if not ignore_errors:
                 raise
             warnings.warn(traceback.format_exc())
@@ -399,7 +399,7 @@ def process(config, period, ignore_errors, cache, renew):
             if cache:
                 try:
                     new_ipv4 = str(get_my_ipv4())
-                except:
+                except Exception:
                     warnings.warn(traceback.format_exc())
                 try:
                     new_ipv6 = str(get_my_ipv6())
@@ -407,7 +407,7 @@ def process(config, period, ignore_errors, cache, renew):
                     pass
                 except requests.exceptions.ConnectionError:
                     pass
-                except:
+                except Exception:
                     warnings.warn(traceback.format_exc())
                 update_needed = ipv4 != new_ipv4 or ipv6 != new_ipv6
 
@@ -434,7 +434,7 @@ def process(config, period, ignore_errors, cache, renew):
             if renew and last_renew_date != datetime.date.today():
                 if start_and_wait_sub_process(_renew) == 0:
                     last_renew_date = datetime.date.today()
-        except:
+        except Exception:
             traceback.print_exc(file=sys.stderr)
         finally:
             time.sleep(period)

@@ -7,7 +7,7 @@ import six
 import yaml
 
 from .domain import Domain
-from .get_my_ip import *
+from .get_my_ip import get_my_ipv4, get_my_ipv6
 from .record import Record, RecordType
 
 
@@ -63,7 +63,7 @@ class Config(dict):
             ipv4 = get_my_ipv4()
             try:
                 ipv6 = get_my_ipv6()
-            except:
+            except Exception:
                 ipv6 = None
         for rec in records:
             ret += self._parse_record(rec, str(ipv4), str(ipv6) if ipv6 else None)
