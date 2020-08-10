@@ -50,7 +50,7 @@ jobs:
       uses: nick-invision/retry@v1
       with:
         retry_wait_seconds: 30
-        timeout_minutes: 5
+        timeout_minutes: 15
         max_attempts: 3
-        command: python -m unittest discover -s ./freenom_dns_updater/test
+        command: python -m unittest discover -s ./freenom_dns_updater/test --failfast
      
