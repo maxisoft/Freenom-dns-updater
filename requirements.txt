@@ -2,7 +2,4 @@ requests
 beautifulsoup4
 PyYAML
 six
-pathlib
-enum34
-ipaddress
 click
