@@ -1,5 +1,5 @@
 import time
-from typing import Optional
+from typing import Optional, Union
 from urllib.parse import urlparse
 
 import requests
@@ -15,9 +15,10 @@ class FreenomSession(requests.Session):
         super().__init__()
         self.last_request_time = time.monotonic()
 
-    def request(self, method, url, *args, **kwargs):
+    def request(self, method, url, *args, **kwargs) -> requests.Response:
         if abs(self.last_request_time - time.monotonic()) < self.request_cooldown:
             time.sleep(self.request_cooldown)
+        res: Optional[requests.Response] = None
         for i in range(self.retry):
             res = super().request(method, url, *args, **kwargs)
             self.last_request_time = time.monotonic()
@@ -27,8 +28,10 @@ class FreenomSession(requests.Session):
                     time.sleep(self.request_cooldown)
                     continue
             return res
+        assert res is not None
+        return res
 
-    def _decode_reason(self, reason):
+    def _decode_reason(self, reason: Union[str, bytes]) -> str:
         if isinstance(reason, bytes):
             try:
                 reason = reason.decode('utf-8')
