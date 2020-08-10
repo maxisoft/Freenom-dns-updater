@@ -31,6 +31,7 @@ jobs:
     - name: Install deps
       run: |
             pip install -r test-requirements.txt &&
+            pip install mypy &&
             pip install -e .
       timeout-minutes: 3
       

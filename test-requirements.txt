@@ -4,4 +4,4 @@ PyYAML
 click
 HTTPretty
 flake8
-mypy
+mypy;platform_python_implementation == "CPython"
