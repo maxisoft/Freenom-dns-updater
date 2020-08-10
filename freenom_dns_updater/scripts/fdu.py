@@ -282,13 +282,14 @@ def record_action(action: Callable[[Freenom, Record], None], config: Config, ign
     err_count = 0
     for rec in records:
         domain_name = rec.domain.name
-        rec.domain = domains_mapping.get(domain_name)
-        if rec.domain is None:
+        rec_domain = domains_mapping.get(domain_name)
+        if rec_domain is None:
             click.secho(f"You don't own the domain \"{domain_name}\"", fg='yellow', bold=True)
             if ignore_errors:
                 continue
             else:
                 sys.exit(7)
+        rec.domain = rec_domain
         try:
             action(freenom, rec)
         except Exception:
@@ -316,14 +317,15 @@ def domain_action(action: Callable[[Freenom, Domain], None], config: Config, ign
     to_process = set()
     for rec in records:
         domain_name = rec.domain.name
-        rec.domain = domains_mapping.get(domain_name)
-        if rec.domain is None:
+        rec_domain = domains_mapping.get(domain_name)
+        if rec_domain is None:
             click.secho(f"You don't own the domain \"{domain_name}\"", fg='yellow', bold=True)
             if ignore_errors:
                 continue
             else:
                 sys.exit(7)
-        to_process.add(rec.domain)
+        rec.domain = rec_domain
+        to_process.add(rec_domain)
 
     for domain in to_process:
         try:

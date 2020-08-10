@@ -36,7 +36,8 @@ class FreenomSession(requests.Session):
             try:
                 reason = reason.decode('utf-8')
             except UnicodeDecodeError:
-                reason = reason.decode('iso-8859-1')
+                if isinstance(reason, bytes):
+                    reason = reason.decode('iso-8859-1')
         return reason
 
     def prepare_request(self, request: requests.Request):

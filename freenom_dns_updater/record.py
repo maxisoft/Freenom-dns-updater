@@ -6,6 +6,7 @@ from .domain import Domain
 
 @unique
 class RecordType(Enum):
+    Invalid = 0
     A = 1
     AAAA = 2
     CNAME = 3
@@ -18,15 +19,16 @@ class RecordType(Enum):
 
 class Record(object):
     def __init__(self, name='', type=RecordType.A, ttl=14440, target: str = '', domain=None):
-        self._name = None
-        self._type = None
-        self._ttl = None
-        self._domain = None
+        self._name = ''
+        self._type = RecordType.Invalid
+        self._ttl = -1
+        self._domain: Optional[Domain] = None
         self.name = name
         self.type = type
         self.ttl = ttl
         self.target = target
-        self.domain = domain
+        if domain is not None:
+            self.domain = domain
 
     @property
     def name(self) -> str:
@@ -60,15 +62,19 @@ class Record(object):
             raise ValueError("bad type")
 
     @property
-    def domain(self) -> Optional[Domain]:
+    def domain(self) -> Domain:
+        assert self._domain is not None
         return self._domain
 
     @domain.setter
     def domain(self, value):
-        if value is None or isinstance(value, Domain):
+        if isinstance(value, Domain):
             self._domain = value
         else:
-            raise ValueError("bad type")
+            raise TypeError(f"bad type {type(value)}")
+
+    def has_domain(self) -> bool:
+        return self._domain is not None
 
     def __str__(self, *args, **kwargs):
         return "Record({0.name}, {0.type.name} -> {0.target})".format(self)
@@ -89,7 +95,7 @@ class Record(object):
             return False
         if self.target != other.target:
             return False
-        if self.domain != other.domain:
+        if self._domain != other._domain:
             return False
         return True
 

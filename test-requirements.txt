@@ -4,4 +4,4 @@ PyYAML
 click
 HTTPretty
 flake8
-pyre-check
+mypy
