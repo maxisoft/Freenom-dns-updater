@@ -38,7 +38,7 @@ jobs:
             pip install -e .
       timeout-minutes: 3
       
-    - name: Run python unit/integration tests
+    - name: Run python unit tests
       run: python -m unittest discover -s ./freenom_dns_updater/test
       timeout-minutes: 20
      
