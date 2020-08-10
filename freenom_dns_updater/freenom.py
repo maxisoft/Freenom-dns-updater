@@ -1,5 +1,4 @@
 import datetime
-import time
 import warnings
 from typing import Optional, List
 from urllib.parse import urljoin, urlparse, quote
@@ -197,7 +196,7 @@ class Freenom(object):
         return urljoin(FREENOM_BASE_URL, f"clientarea.php?managedns={quote(domain.name)}&domainid={quote(domain.id)}")
 
     def need_renew(self, domain):
-        return domain and domain.expire_date - datetime.date.today() < datetime.timedelta(days=14)
+        return domain and domain.expire_date - datetime.date.today() <= datetime.timedelta(days=13)
 
     def renew(self, domain, period: int = 12, url=FREENOM_BASE_URL + '/domains.php?submitrenewals=true'):
         if period not in range(1, 13):
