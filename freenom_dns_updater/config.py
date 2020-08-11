@@ -19,7 +19,6 @@ if hasattr(os, 'getenvb'):
         return os.getenvb(varname.encode(), value)
 else:
     def _getenvb(varname: str, value: T = None) -> Union[Optional[T], bytes]:
-
         res = os.getenv(varname, value)
         if res is value:
             return value
