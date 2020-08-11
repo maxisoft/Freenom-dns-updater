@@ -1,14 +1,28 @@
 import ipaddress
+import os
 import pathlib
 from copy import copy
-from typing import List
+from typing import List, TypeVar, Union, Optional
 
 import six
 import yaml
 
 from .domain import Domain
+from .encrypted_string import EncryptedString
 from .get_my_ip import get_my_ipv4, get_my_ipv6
 from .record import Record, RecordType
+
+T = TypeVar('T')
+
+
+def _getenvb(varname: str, value: T = None) -> Union[Optional[T], bytes]:
+    res = os.getenv(varname, value)
+    if res is value:
+        return value
+    return res.encode() if isinstance(res, str) else res
+
+
+_getenvb = getattr(os, 'getenvb', _getenvb)
 
 
 class Config(dict):
@@ -16,9 +30,10 @@ class Config(dict):
         super().__init__(**kwargs)
         if isinstance(src, pathlib.Path):
             src = str(src)
+        self._records = None
+        self._password: EncryptedString = EncryptedString(b"")
         self.reload(src)
         self.file = src
-        self._records = None
 
     def reload(self, src):
         if isinstance(src, dict):
@@ -29,6 +44,9 @@ class Config(dict):
             with open(src) as f:
                 content = yaml.safe_load(f)
         self.clear()
+        self._password = EncryptedString(content.pop("password", ""),
+                                         key=_getenvb("FDU_KEY"),
+                                         iv=_getenvb("FDU_IV")).ensure_encrypted()
         self.update(content)
         self._records = None
 
@@ -36,17 +54,19 @@ class Config(dict):
         file = file or self.file
         if isinstance(file, six.string_types):
             with open(file, 'w') as f:
-                yaml.dump(dict(self), f)
+                d = dict(self)
+                d["password"] = self._password.str()
+                yaml.dump(d, f)
             return True
         return False
 
     @property
-    def login(self):
+    def login(self) -> str:
         return self['login']
 
     @property
-    def password(self):
-        return self['password']
+    def password(self) -> str:
+        return self._password.str()
 
     @property
     def records(self) -> List[Record]:
