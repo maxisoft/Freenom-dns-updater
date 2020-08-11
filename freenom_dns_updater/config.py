@@ -14,15 +14,16 @@ from .record import Record, RecordType
 
 T = TypeVar('T')
 
+if hasattr(os, 'getenvb'):
+    def _getenvb(varname: str, value: T = None) -> Union[Optional[T], bytes]:
+        return os.getenvb(varname.encode(), value)
+else:
+    def _getenvb(varname: str, value: T = None) -> Union[Optional[T], bytes]:
 
-def _getenvb(varname: str, value: T = None) -> Union[Optional[T], bytes]:
-    res = os.getenv(varname, value)
-    if res is value:
-        return value
-    return res.encode() if isinstance(res, str) else res
-
-
-_getenvb = getattr(os, 'getenvb', _getenvb)
+        res = os.getenv(varname, value)
+        if res is value:
+            return value
+        return res.encode() if isinstance(res, str) else res
 
 
 class Config(dict):
