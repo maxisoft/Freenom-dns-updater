@@ -44,7 +44,7 @@ class EncryptedString:
     @classmethod
     def encrypt(cls, data: Union[bytes, str], key: bytes, iv: bytes, encoding='UTF-8'):
         d: bytes = data if isinstance(data, bytes) else data.encode(encoding)
-        d += b"\0"  # enforce the data to be non empty (because on some OS' crypto won't work without this trick)
+        d += b"\0"  # enforce the data to be non empty (because on some OS, crypto won't work without this trick)
         cls._check_key(key)
         _, d = aes_cbc_pkcs7_encrypt(key, d, iv)
         return (cls.magic + b85encode(d, True) + cls.magicend).decode(encoding)
