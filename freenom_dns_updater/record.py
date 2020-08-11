@@ -6,7 +6,7 @@ from .domain import Domain
 
 @unique
 class RecordType(Enum):
-    Invalid = 0
+    INVALID = 0
     A = 1
     AAAA = 2
     CNAME = 3
@@ -20,7 +20,7 @@ class RecordType(Enum):
 class Record(object):
     def __init__(self, name='', type=RecordType.A, ttl=14440, target: str = '', domain=None):
         self._name = ''
-        self._type = RecordType.Invalid
+        self._type = RecordType.INVALID
         self._ttl = -1
         self._domain: Optional[Domain] = None
         self.name = name
@@ -48,6 +48,7 @@ class Record(object):
 
     @property
     def type(self) -> RecordType:
+        assert self._type != RecordType.INVALID
         return self._type
 
     @type.setter
