@@ -14,6 +14,5 @@ RUN ls -lah dist/fdu
 FROM alpine
 LABEL Description="This image is used to start freenom dns updater" Version="1.0"
 COPY --from=builder /opt/freenom_dns_updater/tmp/dist/fdu /opt/freenom_dns_updater
-RUN ls -lah /opt/freenom_dns_updater
 ENTRYPOINT [ "/opt/freenom_dns_updater/fdu" ]
 CMD [ "process", "-i", "-c", "-t", "3600", "/etc/freenom.yml" ]
