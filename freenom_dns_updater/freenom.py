@@ -1,6 +1,6 @@
 import datetime
 import warnings
-from typing import Optional, List
+from typing import Optional, List, Dict, Union
 from urllib.parse import urljoin, urlparse, quote
 
 import requests
@@ -20,6 +20,8 @@ PARSED_FREENOM_BASE_URL = urlparse(FREENOM_BASE_URL)
 LOGIN_URL = urljoin(FREENOM_BASE_URL, 'dologin.php')
 CLIENT_AREA_URL = urljoin(FREENOM_BASE_URL, 'clientarea.php')
 LIST_DOMAIN_URL = f'{CLIENT_AREA_URL}?action=domains'
+
+HttpParamDict = Dict[str, Union[None, str, int, float]]
 
 
 class Freenom(object):
@@ -46,7 +48,7 @@ class Freenom(object):
 
     def list_domains(self, url: str = LIST_DOMAIN_URL) -> List[Domain]:
         token = self._get_domain_token()
-        payload = {'token': token, 'itemlimit': 'all'}
+        payload: HttpParamDict = {'token': token, 'itemlimit': 'all'}
         r = self.session.post(url, payload)
         r.raise_for_status()
         return DomainParser.parse(r.text)
@@ -72,7 +74,7 @@ class Freenom(object):
 
         url = self.manage_domain_url(record.domain)
         token = self._get_manage_domain_token(url)
-        payload = {
+        payload: HttpParamDict = {
             'dnsaction': 'add',
             'token': token
         }
@@ -96,7 +98,7 @@ class Freenom(object):
     def update_record(self, record: Record, records: Optional[List[Record]] = None) -> int:
         url = self.manage_domain_url(record.domain)
         token = self._get_manage_domain_token(url)
-        payload = {
+        payload: HttpParamDict = {
             'dnsaction': 'modify',
             'token': token
         }
@@ -125,6 +127,11 @@ class Freenom(object):
             records = self.list_records(record.domain)
         if not self.contains_record(record, records):
             return False
+
+        payload: HttpParamDict = {'managedns': record.domain.name, 'domainid': record.domain.id}
+        r = self.session.get(url, params=payload)
+        r.raise_for_status()
+
         payload = {
             'managedns': record.domain.name,
             'page': None,
@@ -177,7 +184,7 @@ class Freenom(object):
             return False
         url = self.manage_domain_url(records[0].domain)
         token = self._get_manage_domain_token(url)
-        payload = {
+        payload: HttpParamDict = {
             'dnsaction': 'modify',
             'token': token
         }
@@ -221,7 +228,7 @@ class Freenom(object):
         url = urljoin(FREENOM_BASE_URL, f'clientarea.php?action=domaindetails&id={quote(domain.id)}')
         i = 1
         token = self._get_set_ns_token(domain)
-        params = {
+        params: HttpParamDict = {
             'id': domain.id,
             'token': token,
             'sub': 'savens',
