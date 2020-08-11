@@ -1,9 +1,4 @@
-requests
-beautifulsoup4
-PyYAML
-six
-pathlib
-enum34
-ipaddress
-click
+-r ./requirements.txt
 HTTPretty
+flake8
+mypy;platform_python_implementation == "CPython"

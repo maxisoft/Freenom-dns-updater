@@ -1,34 +1,52 @@
-import pathlib
-
-import yaml
-import six
 import ipaddress
-
-from .record import Record, RecordType
-from .domain import Domain
+import os
+import pathlib
 from copy import copy
+from typing import List, TypeVar, Union, Optional
 
-from .get_my_ip import *
+import six
+import yaml
+
+from .domain import Domain
+from .encrypted_string import EncryptedString
+from .get_my_ip import get_my_ipv4, get_my_ipv6
+from .record import Record, RecordType
+
+T = TypeVar('T')
+
+if hasattr(os, 'getenvb'):
+    def _getenvb(varname: str, value: T = None) -> Union[Optional[T], bytes]:
+        return os.getenvb(varname.encode(), value)
+else:
+    def _getenvb(varname: str, value: T = None) -> Union[Optional[T], bytes]:
+        res = os.getenv(varname, value)
+        if res is value:
+            return value
+        return res.encode() if isinstance(res, str) else res
 
 
 class Config(dict):
     def __init__(self, src="freenom.yml", **kwargs):
-        super(Config, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if isinstance(src, pathlib.Path):
             src = str(src)
+        self._records = None
+        self._password: EncryptedString = EncryptedString(b"")
         self.reload(src)
         self.file = src
-        self._records = None
 
     def reload(self, src):
         if isinstance(src, dict):
             content = src
         elif hasattr(src, 'read'):
-            content = yaml.load(src)
+            content = yaml.safe_load(src)
         else:
             with open(src) as f:
-                content = yaml.load(f)
+                content = yaml.safe_load(f)
         self.clear()
+        self._password = EncryptedString(content.pop("password", ""),
+                                         key=_getenvb("FDU_KEY"),
+                                         iv=_getenvb("FDU_IV")).ensure_encrypted()
         self.update(content)
         self._records = None
 
@@ -36,20 +54,22 @@ class Config(dict):
         file = file or self.file
         if isinstance(file, six.string_types):
             with open(file, 'w') as f:
-                yaml.dump(self, f)
+                d = dict(self)
+                d["password"] = self._password.str()
+                yaml.dump(d, f)
             return True
         return False
 
     @property
-    def login(self):
+    def login(self) -> str:
         return self['login']
 
     @property
-    def password(self):
-        return self['password']
+    def password(self) -> str:
+        return self._password.str()
 
     @property
-    def records(self):
+    def records(self) -> List[Record]:
         if self._records is not None:
             return self._records
 
@@ -63,14 +83,14 @@ class Config(dict):
             ipv4 = get_my_ipv4()
             try:
                 ipv6 = get_my_ipv6()
-            except:
+            except Exception:
                 ipv6 = None
         for rec in records:
             ret += self._parse_record(rec, str(ipv4), str(ipv6) if ipv6 else None)
         self._records = ret
         return ret
 
-    def _parse_record(self, raw_record, ipv4, ipv6):
+    def _parse_record(self, raw_record, ipv4, ipv6) -> List[Record]:
         assert isinstance(raw_record, dict)
         domain_name = raw_record['domain']
         assert isinstance(domain_name, six.string_types)

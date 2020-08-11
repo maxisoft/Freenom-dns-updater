@@ -1,0 +1,11 @@
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    docs/source/conf.py,
+    freenom_dns_updater/test,
+    test,
+    build,
+    dist,
+    venv
+max-line-length = 120

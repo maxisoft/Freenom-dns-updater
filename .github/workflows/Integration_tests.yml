@@ -1,0 +1,56 @@
+name: Integration Test using real freenom account
+
+on:
+  push:
+    branches: [ main, dev ]
+  schedule:
+    - cron: '42 22 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+      
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Setup pip cache
+      uses: actions/cache@v2
+      timeout-minutes: 5
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install deps
+      run: |
+            pip install -r test-requirements.txt &&
+            pip install -e .
+      timeout-minutes: 3
+
+
+    - name: Setup login creds
+      run: |
+            echo "::set-env name=FREENOM_LOGIN::${{ secrets.FREENOM_LOGIN }}"
+            echo "::set-env name=FREENOM_PASSWORD::${{ secrets.FREENOM_PASSWORD }}"
+
+    - name: Lock using Turnstyle
+      timeout-minutes: 15
+      uses: softprops/turnstyle@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: Run python unit/integration tests
+      uses: nick-invision/retry@v1
+      with:
+        retry_wait_seconds: 30
+        timeout_minutes: 15
+        max_attempts: 3
+        command: python -m unittest discover -s ./freenom_dns_updater/test --failfast
+     

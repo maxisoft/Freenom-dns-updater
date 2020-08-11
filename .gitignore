@@ -6,6 +6,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.venv/
 
 # C extensions
 *.so
@@ -27,6 +28,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+venv/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -183,3 +185,6 @@ $RECYCLE.BIN/
 # Project-level settings
 /.tgitconfig
 
+
+
+freenom.yml

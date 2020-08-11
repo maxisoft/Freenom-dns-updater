@@ -3,15 +3,15 @@ import datetime
 
 class Domain(object):
     def __init__(self, name=""):
-        self.name = name
+        self.name: str = name
         self._register_date = datetime.date.today()
         self._expire_date = datetime.date.today()
-        self.state = ""
-        self.type = ""
-        self.id = -1
+        self.state: str = ""
+        self.type: str = ""
+        self._id: str = ""
 
     @property
-    def register_date(self):
+    def register_date(self) -> datetime.date:
         return self._register_date
 
     @register_date.setter
@@ -24,7 +24,7 @@ class Domain(object):
             self.register_date = self.parse_date(value)
 
     @property
-    def expire_date(self):
+    def expire_date(self) -> datetime.date:
         return self._expire_date
 
     @expire_date.setter
@@ -36,8 +36,16 @@ class Domain(object):
         else:
             self._expire_date = self.parse_date(value)
 
+    @property
+    def id(self) -> str:
+        return self._id
+
+    @id.setter
+    def id(self, value):
+        self._id = str(value)
+
     @staticmethod
-    def parse_date(value):
+    def parse_date(value) -> datetime.date:
         try:
             return datetime.datetime.strptime(value, '%Y-%m-%d').date()
         except ValueError:
@@ -70,3 +78,6 @@ class Domain(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self.name)

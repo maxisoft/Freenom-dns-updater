@@ -1,6 +1,7 @@
 import pathlib
 import random
 import unittest
+from copy import copy
 from pprint import pprint
 
 import datetime
@@ -20,7 +21,7 @@ Temporary export your login password as the following env variables: FREENOM_LOG
 then write your testing domain id and name as env variables : FREENOM_TEST_DOMAIN_ID and FREENOM_TEST_DOMAIN_NAME
 '''
 
-TEST_DOMAIN_ID = int(os.getenv("FREENOM_TEST_DOMAIN_ID", 1027889227))
+TEST_DOMAIN_ID = int(os.getenv("FREENOM_TEST_DOMAIN_ID", 1096252459))
 TEST_DOMAIN_NAME = str(os.getenv("FREENOM_TEST_DOMAIN_NAME", 'freenom-dns-updater.tk'))
 
 
@@ -28,6 +29,7 @@ class FreenomTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(FreenomTest, self).__init__(*args, **kwargs)
         self.config_file = self.find_config_file("freenom.yml")
+        self.freenom = None
 
     def setUp(self):
         self.freenom = Freenom()
@@ -39,6 +41,10 @@ class FreenomTest(unittest.TestCase):
             self.config = None
             self.login = os.getenv("FREENOM_LOGIN", None)
             self.password = os.getenv("FREENOM_PASSWORD", None)
+
+    def tearDown(self):
+        del self.freenom
+
 
     @staticmethod
     def find_config_file(name):
@@ -59,9 +65,11 @@ class FreenomTest(unittest.TestCase):
         self.assertTrue(self.freenom.login(self.login, self.password))
 
     def test_login_fail(self):
+        self.skipIfNoLogin()
         self.assertFalse(self.freenom.login("", ""))
 
     def test__get_token(self):
+        self.skipIfNoLogin()
         result = self.freenom._get_login_token()
         self.assertIsInstance(result, six.string_types)
         self.assertTrue(result)
@@ -73,6 +81,7 @@ class FreenomTest(unittest.TestCase):
                               self.freenom._get_login_token, "http://httpbin.org/html")
 
     def test_is_logged_in(self):
+        self.skipIfNoLogin()
         self.assertFalse(self.freenom.is_logged_in())
         self.test_login()
         self.assertTrue(self.freenom.is_logged_in())
@@ -143,9 +152,10 @@ class FreenomTest(unittest.TestCase):
         record.ttl = 14440
 
         self.test_login()
-        self.add_record_if_missing(record)
+        cleanup = self.add_record_if_missing(record)
+        original_record = copy(record)
         records_before = self.freenom.list_records(domain)
-        record.target = "185.45.193.%d" % random.randint(1000, 3500)
+        record.target = "185.45.193.%d" % random.randint(1000, 3500)  # this is an invalid ip address
         try:
             self.freenom.update_record(record)
         except UpdateError as e:
@@ -156,7 +166,8 @@ class FreenomTest(unittest.TestCase):
         else:
             self.fail("exception %s expected " % UpdateError.__name__)
         finally:
-            self.freenom.remove_record(record)
+            if cleanup:
+                self.freenom.remove_record(original_record)
 
     def test_remove_record(self):
         domain = Domain()
@@ -177,17 +188,22 @@ class FreenomTest(unittest.TestCase):
         self.assertTrue(res)
         self.assertNotIn(record, self.freenom.list_records(domain))
 
-    def add_record_if_missing(self, record):
+    def add_record_if_missing(self, record) -> bool:
         if record not in self.freenom:
             self.freenom.add_record(record)
+            return True
+        return False
 
-    def remove_record_if_exists(self, record):
-        if record in self.freenom:
-            self.freenom.remove_record(record)
+    def remove_record_if_exists(self, record) -> bool:
+        saved = self.freenom.get_matching_record(record)
+        if saved is not None:
+            self.freenom.remove_record(saved)
+            return True
+        return False
 
     def skipIfNoLogin(self):
-        if self.login is None and self.password is None:
-            self.skipTest("login and password are not set")
+        if self.login is None or self.password is None:
+            self.skipTest("login or password not set")
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
-import re
+from typing import List
+from urllib.parse import urlsplit, parse_qs
 
 from bs4 import BeautifulSoup
 
@@ -6,10 +7,8 @@ from .domain import Domain
 
 
 class DomainParser(object):
-    regex_domain_id = "clientarea\.php\?action=domaindetails&id=(\d+)"
-
     @classmethod
-    def parse(cls, raw_html):
+    def parse(cls, raw_html) -> List[Domain]:
         soup = BeautifulSoup(raw_html, "html.parser")
         tag = soup.find("form", {'id': 'bulkactionform'})
         assert tag, "can't parse the given html"
@@ -23,7 +22,8 @@ class DomainParser(object):
             domain.expire_date = props[2].text
             domain.state = props[3].text
             domain.type = props[4].text
-            domain.id = props[5].find('a')['href']
-            domain.id = re.match(cls.regex_domain_id, domain.id).group(1)
+            href = props[5].find('a')['href']
+            query = urlsplit(href).query
+            domain.id = parse_qs(query)['id'][0]
             ret.append(domain)
         return ret
