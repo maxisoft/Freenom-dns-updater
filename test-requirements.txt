@@ -1,7 +1,4 @@
-requests
-beautifulsoup4
-PyYAML
-click
+-r ./requirements.txt
 HTTPretty
 flake8
 mypy;platform_python_implementation == "CPython"
