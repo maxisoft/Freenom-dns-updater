@@ -107,16 +107,4 @@ jobs:
             --file docker/Dockerfile . \
             --tag maxisoft/freenom-dns-updater-testing:python3 \
             --label "vcs-ref=${GITHUB_SHA}"
-    - 
-      name: Build Dockerfile.nuitka (with push)
-      if: success() && github.ref == 'refs/heads/docker'
-      timeout-minutes: 30
-      run: |
-            set -x
-            docker buildx build \
-            --platform=linux/amd64,linux/arm/v7 \
-            --output "type=image,push=true" \
-            --file docker/Dockerfile.nuitka . \
-            --tag maxisoft/freenom-dns-updater-testing:nuitka \
-            --label "vcs-ref=${GITHUB_SHA}"
 
