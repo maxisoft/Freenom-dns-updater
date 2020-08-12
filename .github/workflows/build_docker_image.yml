@@ -82,9 +82,9 @@ jobs:
             echo '${{ secrets.DOCKERIO_PASSWORD }}' | docker login --username "maxisoft" --password-stdin
 
     - 
-      name: Build dockerfile (with push)
+      name: Build Dockerfile.pyinstaller (with push)
       if: success() && github.ref == 'refs/heads/docker'
-      timeout-minutes: 90
+      timeout-minutes: 30
       run: |
             set -x
             docker buildx build \
@@ -92,5 +92,31 @@ jobs:
             --output "type=image,push=true" \
             --file docker/Dockerfile.pyinstaller . \
             --tag maxisoft/freenom-dns-updater-testing:latest \
-            --tag maxisoft/freenom-dns-updater-testing:pyinstaller
+            --tag maxisoft/freenom-dns-updater-testing:pyinstaller \
+            --label "vcs-ref=${GITHUB_SHA}"
+
+      - 
+        name: Build Dockerfile (with push)
+        if: success() && github.ref == 'refs/heads/docker'
+        timeout-minutes: 30
+        run: |
+              set -x
+              docker buildx build \
+              --platform=linux/amd64,linux/386,linux/arm/v7,linux/arm64/v8,linux/arm/v6 \
+              --output "type=image,push=true" \
+              --file docker/Dockerfile . \
+              --tag maxisoft/freenom-dns-updater-testing:python3 \
+              --label "vcs-ref=${GITHUB_SHA}"
+      - 
+        name: Build Dockerfile.nuitka (with push)
+        if: success() && github.ref == 'refs/heads/docker'
+        timeout-minutes: 30
+        run: |
+              set -x
+              docker buildx build \
+              --platform=linux/amd64,linux/arm/v7 \
+              --output "type=image,push=true" \
+              --file docker/Dockerfile.nuitka . \
+              --tag maxisoft/freenom-dns-updater-testing:nuitka \
+              --label "vcs-ref=${GITHUB_SHA}"
 

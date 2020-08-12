@@ -6,7 +6,7 @@ RUN python3 -m pip install --no-cache-dir /opt/freenom_dns_updater/tmp/dist/free
 RUN rm -rf /opt/freenom_dns_updater/tmp
 
 FROM python:3-alpine
-LABEL Description="This image is used to start freenom dns updater" Version="1.0"
+LABEL maintainer="github.com/maxisoft" name="freenom-dns-updater" description="A tool written in python to update freenom's dns records" url="https://github.com/maxisoft/Freenom-dns-updater" vcs-url="https://github.com/maxisoft/Freenom-dns-updater" 
 COPY --from=builder / /
-WORKDIR /opt/freenom_dns_updater
-CMD fdu process -i -c -t 3600 /etc/freenom.yml
+ENTRYPOINT [ "python3", "-m", "fdu" ]
+CMD [ "process", "-i", "-c", "-r", "-t", "3600", "/etc/freenom.yml" ]

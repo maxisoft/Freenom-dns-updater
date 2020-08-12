@@ -8,11 +8,12 @@ RUN cd /tmp && unzip Nuitka.zip && rm -f Nuitka.zip
 RUN cd /tmp/Nuitka* && python3 setup.py install
 RUN python3 -m pip install --no-cache-dir /opt/freenom_dns_updater/tmp/dist/freenom*.whl
 RUN python3 -m pip uninstall -y freenom-dns-updater
-RUN python3 -m nuitka --standalone --show-progress --plugin-enable=multiprocessing --follow-imports freenom_dns_updater/scripts/fdu.py
+RUN python3 -m nuitka --plugin-enable=multiprocessing --follow-imports freenom_dns_updater/scripts/fdu.py
 
 
 FROM python:3-alpine
-LABEL Description="This image is used to start freenom dns updater" Version="1.0"
-COPY --from=builder /opt/freenom_dns_updater/tmp/fdu.bin /usr/bin/fdu
-RUN ls -lah /opt
-CMD fdu process -i -c -t 3600 /etc/freenom.yml
+LABEL maintainer="github.com/maxisoft" name="freenom-dns-updater" description="A tool written in python to update freenom's dns records" url="https://github.com/maxisoft/Freenom-dns-updater" vcs-url="https://github.com/maxisoft/Freenom-dns-updater" 
+COPY --from=builder /opt/freenom_dns_updater/tmp /opt/freenom_dns_updater
+WORKDIR /opt/freenom_dns_updater
+ENTRYPOINT [ "/opt/freenom_dns_updater/fdu.bin" ]
+CMD [ "process", "-i", "-c", "-r", "-t", "3600", "/etc/freenom.yml" ]
