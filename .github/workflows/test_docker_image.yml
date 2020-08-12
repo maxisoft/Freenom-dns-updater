@@ -1,0 +1,85 @@
+name: Minimal tests for docker images
+
+on:
+  push:
+    branches: [ main, dev, docker ]
+  pull_request:
+    branches: [ main, dev, docker ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - 
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+      
+    - 
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - 
+      name: Setup pip cache
+      uses: actions/cache@v2
+      timeout-minutes: 5
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - 
+      name: Install deps
+      run: |
+            pip install -r test-requirements.txt &&
+            pip install -e . &&
+            pip install wheel
+      timeout-minutes: 3
+
+    - 
+      name: Build the wheel
+      run: python setup.py bdist_wheel
+
+    - 
+      name: Build Dockerfile
+      timeout-minutes: 20
+      run: |
+            docker build -t fdu_testing -f ./docker/Dockerfile .
+
+    - 
+      name: Test Docker container
+      timeout-minutes: 3
+      run: |
+          docker run -it --rm fdu_testing --help
+
+    - 
+      name: Install and Run Dive
+      timeout-minutes: 2
+      run: |
+            pushd /tmp
+            wget --no-verbose https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
+            sudo apt install --quiet -y ./dive_0.9.2_linux_amd64.deb
+            popd
+            CI=true dive --ci-config "${{ github.workspace }}/.dive-ci" fdu_testing
+
+    - 
+      name: Build Dockerfile (PyInstaller)
+      timeout-minutes: 10
+      run: |
+            docker build -t fdu_testing -f ./docker/Dockerfile.pyinstaller .
+
+    - 
+      name: Test Docker container (PyInstaller)
+      timeout-minutes: 3
+      run: |
+          docker run -it --rm fdu_testing --help
+
+    - 
+      name: Run Dive
+      timeout-minutes: 2
+      run: |
+            CI=true dive --ci-config "${{ github.workspace }}/.dive-ci" fdu_testing
+        
