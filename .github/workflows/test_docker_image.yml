@@ -53,7 +53,7 @@ jobs:
       name: Test Docker container
       timeout-minutes: 3
       run: |
-          docker run -it --rm fdu_testing --help
+          docker run --rm fdu_testing --help
 
     - 
       name: Install and Run Dive
@@ -75,7 +75,7 @@ jobs:
       name: Test Docker container (PyInstaller)
       timeout-minutes: 3
       run: |
-          docker run -it --rm fdu_testing --help
+          docker run --rm fdu_testing --help
 
     - 
       name: Run Dive
