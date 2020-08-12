@@ -69,17 +69,17 @@ jobs:
       name: Build Dockerfile (PyInstaller)
       timeout-minutes: 10
       run: |
-            docker build -t fdu_testing -f ./docker/Dockerfile.pyinstaller .
+            docker build -t fdu_testing:pyinstaller -f ./docker/Dockerfile.pyinstaller .
 
     - 
       name: Test Docker container (PyInstaller)
       timeout-minutes: 3
       run: |
-          docker run --rm fdu_testing --help
+          docker run --rm fdu_testing:pyinstaller --help
 
     - 
       name: Run Dive
       timeout-minutes: 2
       run: |
-            CI=true dive --ci-config "${{ github.workspace }}/.dive-ci" fdu_testing
+            CI=true dive --ci-config "${{ github.workspace }}/.dive-ci" fdu_testing:pyinstaller
         
