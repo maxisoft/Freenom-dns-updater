@@ -45,7 +45,7 @@ jobs:
       name: Test Docker container
       timeout-minutes: 3
       run: |
-          docker run -it --rm fdu_testing --help
+          docker run --rm fdu_testing --help
 
     - name: Install and Run Dive
       timeout-minutes: 2
@@ -65,7 +65,7 @@ jobs:
       name: Test Docker container (PyInstaller)
       timeout-minutes: 3
       run: |
-          docker run -it --rm fdu_testing --help
+          docker run --rm fdu_testing --help
 
     - name: Run Dive
       timeout-minutes: 2
@@ -147,4 +147,14 @@ jobs:
             --file docker/Dockerfile . \
             --tag maxisoft/freenom-dns-updater:python3 \
             --label "vcs-ref=${GITHUB_SHA}"
+
+    - 
+      name: Update microbadger
+      shell: python
+      timeout-minutes: 1
+      if: success() && github.ref == 'refs/heads/main'
+      continue-on-error: true
+      run: |
+            import requests
+            requests.post(r'''${{ secrets.MICROBADGER_HOOK_URL }}''').raise_for_status()
 
