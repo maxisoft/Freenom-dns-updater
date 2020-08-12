@@ -1,4 +1,4 @@
-name: Build docker image
+name: Build and Push docker images
 
 on:
   push:
@@ -41,7 +41,13 @@ jobs:
       run: |
             docker build -t fdu_testing -f ./docker/Dockerfile .
 
-    - name: Run Dive
+    - 
+      name: Test Docker container
+      timeout-minutes: 3
+      run: |
+          docker run -it --rm fdu_testing --help
+
+    - name: Install and Run Dive
       timeout-minutes: 2
       run: |
             pushd /tmp
@@ -54,6 +60,12 @@ jobs:
       timeout-minutes: 10
       run: |
             docker build -t fdu_testing -f ./docker/Dockerfile.pyinstaller .
+
+    - 
+      name: Test Docker container (PyInstaller)
+      timeout-minutes: 3
+      run: |
+          docker run -it --rm fdu_testing --help
 
     - name: Run Dive
       timeout-minutes: 2
@@ -80,10 +92,10 @@ jobs:
       timeout-minutes: 1
       run: |
             echo '${{ secrets.DOCKERIO_PASSWORD }}' | docker login --username "maxisoft" --password-stdin
-
+    
     - 
       name: Build Dockerfile.pyinstaller (with push)
-      if: success() && github.ref == 'refs/heads/docker'
+      if: success() && github.ref != 'refs/heads/main'
       timeout-minutes: 30
       run: |
             set -x
@@ -97,7 +109,7 @@ jobs:
 
     - 
       name: Build Dockerfile (with push)
-      if: success() && github.ref == 'refs/heads/docker'
+      if: success() && github.ref != 'refs/heads/main'
       timeout-minutes: 30
       run: |
             set -x
@@ -106,5 +118,33 @@ jobs:
             --output "type=image,push=true" \
             --file docker/Dockerfile . \
             --tag maxisoft/freenom-dns-updater-testing:python3 \
+            --label "vcs-ref=${GITHUB_SHA}"
+
+
+    - 
+      name: Build Dockerfile.pyinstaller (with push)
+      if: success() && github.ref == 'refs/heads/main'
+      timeout-minutes: 30
+      run: |
+            set -x
+            docker buildx build \
+            --platform=linux/amd64,linux/386,linux/arm/v7,linux/arm64/v8,linux/arm/v6 \
+            --output "type=image,push=true" \
+            --file docker/Dockerfile.pyinstaller . \
+            --tag maxisoft/freenom-dns-updater:latest \
+            --tag maxisoft/freenom-dns-updater:pyinstaller \
+            --label "vcs-ref=${GITHUB_SHA}"
+
+    - 
+      name: Build Dockerfile (with push)
+      if: success() && github.ref == 'refs/heads/main'
+      timeout-minutes: 30
+      run: |
+            set -x
+            docker buildx build \
+            --platform=linux/amd64,linux/386,linux/arm/v7,linux/arm64/v8,linux/arm/v6 \
+            --output "type=image,push=true" \
+            --file docker/Dockerfile . \
+            --tag maxisoft/freenom-dns-updater:python3 \
             --label "vcs-ref=${GITHUB_SHA}"
 
