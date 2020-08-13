@@ -1,8 +1,8 @@
-import unittest
 import ipaddress
+import json
+import unittest
 
 import httpretty
-import json
 import requests.exceptions
 import six
 

@@ -1,14 +1,14 @@
 import datetime
 import warnings
-from typing import Optional, List, Dict, Union
-from urllib.parse import urljoin, urlparse, quote
+from typing import Dict, List, Optional, Union
+from urllib.parse import quote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
 from .domain import Domain
 from .domain_parser import DomainParser
-from .exception import UpdateError, AddError
+from .exception import AddError, UpdateError
 from .freenom_session import FreenomSession
 from .record import Record
 from .record_parser import RecordParser

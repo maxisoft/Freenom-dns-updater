@@ -1,5 +1,6 @@
-import requests
 import ipaddress
+
+import requests
 
 __all__ = ['get_my_ip', 'get_my_ipv4', 'get_my_ipv6']
 

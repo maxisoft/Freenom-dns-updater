@@ -2,7 +2,7 @@ import ipaddress
 import os
 import pathlib
 from copy import copy
-from typing import List, TypeVar, Union, Optional
+from typing import List, Optional, TypeVar, Union
 
 import six
 import yaml

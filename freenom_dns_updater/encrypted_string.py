@@ -1,6 +1,6 @@
 import warnings
 from base64 import b85decode, b85encode
-from typing import Union, Optional
+from typing import Optional, Union
 
 from oscrypto.symmetric import aes_cbc_pkcs7_decrypt, aes_cbc_pkcs7_encrypt
 

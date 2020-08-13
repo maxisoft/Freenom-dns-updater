@@ -1,5 +1,5 @@
 from typing import List
-from urllib.parse import urlsplit, parse_qs
+from urllib.parse import parse_qs, urlsplit
 
 from bs4 import BeautifulSoup
 
