@@ -3,6 +3,7 @@
 ![Unit Test dev and main branch](https://github.com/maxisoft/Freenom-dns-updater/workflows/Unit%20Test%20dev%20and%20main%20branch/badge.svg)
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/Freenom-dns-updater)
 
+
 A tool written in python to update [freenom](http://Freenom.com)'s dns records
 
 ## Main Features

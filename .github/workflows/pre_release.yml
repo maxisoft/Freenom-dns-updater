@@ -1,0 +1,82 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release a new pre version
+
+on:
+  push:
+    tags:
+    - 'pre*'
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+    - name: Extract tag name
+      id: tag
+      uses: actions/github-script@0.2.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          return context.payload.ref.replace("refs/tags/pre", '');
+    
+    - name: Export tag
+      run: |
+            echo "${{ steps.tag.outputs.result }}"
+            echo "::set-env name=SETUP_VERSION_OVERWRITE::${{ steps.tag.outputs.result }}"
+            echo "::set-env name=TWINE_USERNAME::__token__"
+            echo "::set-env name=TWINE_PASSWORD::${{ secrets.TESTPYPI_TOKEN }}"
+
+
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+      
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install deps
+      run: |
+            pip install -r test-requirements.txt &&
+            pip install --upgrade setuptools wheel twine
+      timeout-minutes: 3
+
+    - name: Build wheel
+      run: |
+            python setup.py sdist bdist_wheel
+      timeout-minutes: 3
+
+    - 
+      name: Check with Twine
+      run: |
+            twine check dist/*
+      timeout-minutes: 3
+    
+    - 
+      name: Upload with Twine
+      run: |
+            twine upload --disable-progress-bar --non-interactive --repository testpypi dist/*
+      timeout-minutes: 3
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Release Build
+        path: dist/*
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Pre-release ${{ github.ref }}
+        draft: true
+        prerelease: true
