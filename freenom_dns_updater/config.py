@@ -90,12 +90,13 @@ class Config(dict):
         self._records = ret
         return ret
 
-    def _parse_record(self, raw_record, ipv4, ipv6) -> List[Record]:
-        assert isinstance(raw_record, dict)
+    def _parse_record(self, raw_record: dict, ipv4: Optional[str], ipv6: Optional[str]) -> List[Record]:
         domain_name = raw_record['domain']
-        assert isinstance(domain_name, six.string_types)
-        domain_name.strip().lower()
-        assert domain_name
+        if not isinstance(domain_name, six.string_types):
+            raise TypeError("domain's name must be a string")
+        domain_name = domain_name.strip().lower()
+        if not domain_name:
+            raise ValueError("empty domain name")
         domain = Domain()
         domain.name = domain_name
 
@@ -105,7 +106,8 @@ class Config(dict):
         tmp = raw_record.get('name')
         if tmp is not None:
             record.name = str(tmp)
-            assert record.name
+            if not record.name:
+                raise ValueError("empty record name")
 
         type_given = False
         if 'type' in raw_record:
@@ -142,12 +144,16 @@ class Config(dict):
         else:  # target not given or target is 'auto'
             if type_given:
                 if record.type == RecordType.AAAA:
-                    assert ipv6
+                    if not ipv6:
+                        raise ValueError("empty ipv6")
                     record.target = ipv6
                 elif record.type == RecordType.A:
-                    assert ipv4
+                    if not ipv4:
+                        raise ValueError("empty ipv4")
                     record.target = ipv4
             else:  # type not given
+                if not ipv4:
+                    raise ValueError("empty ipv4")
                 record.type = RecordType.A
                 record.target = ipv4
                 if ipv6 is not None:

@@ -11,7 +11,8 @@ class DomainParser(object):
     def parse(cls, raw_html) -> List[Domain]:
         soup = BeautifulSoup(raw_html, "html.parser")
         tag = soup.find("form", {'id': 'bulkactionform'})
-        assert tag, "can't parse the given html"
+        if not tag:
+            raise ValueError("can't parse the given html")
         raw_domains = tag.select("tbody > tr")
         ret = []
         for raw_domain in raw_domains:

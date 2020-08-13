@@ -4,7 +4,7 @@ import json
 import pathlib
 import platform
 import pprint
-import subprocess
+import subprocess  # nosec
 import sys
 import time
 import traceback
