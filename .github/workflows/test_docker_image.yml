@@ -15,33 +15,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: 'recursive'
-      
-    - 
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
-    - 
-      name: Setup pip cache
-      uses: actions/cache@v2
-      timeout-minutes: 5
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
-    - 
-      name: Install deps
-      run: |
-            pip install -r test-requirements.txt &&
-            pip install -e . &&
-            pip install wheel
-      timeout-minutes: 3
-
-    - 
-      name: Build the wheel
-      run: python setup.py bdist_wheel
 
     - 
       name: Build Dockerfile
