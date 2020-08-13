@@ -162,7 +162,7 @@ def record_update(user, password, domain, name, type, target, ttl):
         if any(msg != 'There were no changes' for msg in update_error.msgs):
             click.echo(f"Update errors: {update_error.msgs}", err=True)
     except Exception as e:
-        click.echo("Error while updating: %s" % e, err=True)
+        click.echo(f"Error while updating: {e}", err=True)
 
     if not ok_count:
         click.secho('No record updated', fg='yellow', bold=True)
@@ -213,9 +213,9 @@ def _update(config, ignore_errors):
             click.echo(f'Updated {ok_count} record{"s" if ok_count > 1 else ""}')
     except UpdateError as update_error:
         if any(msg != 'There were no changes' for msg in update_error.msgs):
-            click.echo("Update errors: %s" % update_error.msgs, err=True)
+            click.echo(f"Update errors: {update_error.msgs}", err=True)
     except Exception as e:
-        click.echo("Error while updating: %s" % e, err=True)
+        click.echo(f"Error while updating: {e}", err=True)
 
     if not ok_count:
         click.secho('No record updated', fg='yellow', bold=True)
@@ -240,9 +240,9 @@ def _renew(config, ignore_errors):
             click.echo(f'Updated {ok_count} domain{"s" if ok_count > 1 else ""}')
     except UpdateError as update_error:
         if any(msg != 'There were no changes' for msg in update_error.msgs):
-            click.echo("Update errors: %s" % update_error.msgs, err=True)
+            click.echo(f"Update errors: {update_error.msgs}", err=True)
     except Exception as e:
-        click.echo("Error while updating: %s" % e, err=True)
+        click.echo(f"Error while updating: {e}", err=True)
 
     if not ok_count:
         click.secho('No record updated', fg='yellow', bold=True)
