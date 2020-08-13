@@ -78,7 +78,7 @@ class Freenom(object):
             'dnsaction': 'add',
             'token': token
         }
-        record_id = "addrecord[%d]" % 0
+        record_id = f"addrecord[{0:d}]"
         payload[record_id + "[name]"] = str(record.name)
         payload[record_id + "[type]"] = record.type.name
         payload[record_id + "[ttl]"] = str(record.ttl)
@@ -106,7 +106,7 @@ class Freenom(object):
         if records is None:
             records = self.list_records(record.domain)
         for i, rec in enumerate(records):
-            record_id = "records[%d]" % i
+            record_id = f"records[{i:d}]"
             if rec.name == record.name and rec.type == record.type:
                 rec = record
             payload[record_id + "[line]"] = ""
@@ -189,7 +189,7 @@ class Freenom(object):
             'token': token
         }
         for i, rec in enumerate(records):
-            record_id = "records[%d]" % i
+            record_id = f"records[{i:d}]"
             payload[record_id + "[line]"] = ""
             payload[record_id + "[type]"] = rec.type.name
             payload[record_id + "[name]"] = str(rec.name)
