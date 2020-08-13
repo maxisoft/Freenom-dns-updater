@@ -4,4 +4,6 @@ flake8
 flake8-bugbear
 flake8-isort
 flake8-pep3101
+flake8-fixme
+flake8-mutable
 mypy;platform_python_implementation == "CPython"
