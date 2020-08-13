@@ -1,8 +1,8 @@
 FROM python:3-alpine as builder
 RUN mkdir -p '/opt/freenom_dns_updater'
-COPY . /opt/freenom_dns_updater/
+COPY . /opt/freenom_dns_updater
 WORKDIR /opt/freenom_dns_updater
-RUN python3 -m pip install --no-cache-dir .
+RUN python3 -m pip install --no-cache-dir /opt/freenom_dns_updater/dist/freenom*.whl
 RUN rm -rf /opt/freenom_dns_updater
 
 FROM python:3-alpine

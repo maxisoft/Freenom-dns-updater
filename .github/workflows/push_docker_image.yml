@@ -26,15 +26,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-    - name: Install deps
+    - name: Install requests
       run: |
-            pip install -r test-requirements.txt &&
-            pip install -e . &&
-            pip install wheel
+            pip install requests
       timeout-minutes: 3
-
-    - name: Build the wheel
-      run: python setup.py bdist_wheel
 
     - name: Build Dockerfile
       timeout-minutes: 20
