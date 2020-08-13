@@ -1,12 +1,17 @@
 # Freenom dns updater
+[![GitHub license](https://img.shields.io/github/license/maxisoft/Freenom-dns-updater)](https://github.com/maxisoft/Freenom-dns-updater/blob/main/LICENSE.txt)
+![Unit Test dev and main branch](https://github.com/maxisoft/Freenom-dns-updater/workflows/Unit%20Test%20dev%20and%20main%20branch/badge.svg)
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/Freenom-dns-updater)
+
 A tool written in python to update [freenom](http://Freenom.com)'s dns records
 
 ## Main Features
 * Manage (add/update/remove) a domain's dns record with cli
 * Automatic records updates according to ip (v4/v6) changes
+* Auto renew domains
 
 ## Upcoming features
-* Auto renew domains
+* Password encryption
 
 ## Installation
 ```bash
@@ -85,7 +90,7 @@ Where */path/to/config* can be either:
 ## Schedule
 In order to launch regularly an update, you can launch the tool with :
 ```bash
-fdu process -c -i -t 3600 /path/to/config
+fdu process -c -i -r -t 3600 /path/to/config
 ```
 Where the params are :  
 
@@ -93,6 +98,7 @@ Where the params are :
 |-----------------|------------------------------------------------------|
 | -c              | cache the ip and update only if there is any changes |
 | -i              | ignore errors when updating                          |
+| -r              | renew the domains                          |
 | -t              | time (in second) to wait between two updates         |
 | /path/to/config | a path or a url to a configuration file              |
 
@@ -115,12 +121,12 @@ There's two straightforward choices :
 - Schedule the ```fdu update``` command using cron, windows' scheduled task, ...
 
 ## Known issues
-- The domain [my.freenom.com](my.freenom.com) has [SSL Chain issues](https://www.ssllabs.com/ssltest/analyze.html?d=my.freenom.com). For now this tool use a custom ``chain.pem`` to avoid ssl errors.
+- The website [my.freenom.com](my.freenom.com) is not really stable (503/504 errors very often) => there's 3 retry on every request made by the tool but even with this it's common to face a remote server error   
 
 ## Docker image
-[![Docker layers](https://badge.imagelayers.io/maxisoft/freenom-dns-updater:latest.svg)](https://imagelayers.io/?images=maxisoft/freenom-dns-updater:latest)
+[![](https://images.microbadger.com/badges/image/maxisoft/freenom-dns-updater.svg)](https://microbadger.com/images/maxisoft/freenom-dns-updater "")
 
-If you want to run this tool in an isolated environment there's a docker image available at
+If you want to run this tool in an "isolated" environment there's a docker image available at
 [maxisoft/freenom-dns-updater](https://hub.docker.com/r/maxisoft/freenom-dns-updater/)
 
 ### Ipv6
@@ -129,13 +135,9 @@ Note that if you want to use the ipv6 functionality, you have to enable the [doc
 ### Examples
 - Update dns records using a gist config file :
 ```bash
-docker run -it --rm maxisoft/freenom-dns-updater-armhf fdu update https://gist.githubusercontent.com/maxisoft/1b979b64e4cf5157d58d/raw/freenom.yml
+docker run -it --rm maxisoft/freenom-dns-updater fdu update https://gist.githubusercontent.com/maxisoft/1b979b64e4cf5157d58d/raw/freenom.yml
 ```
 - Run the tool in a background docker with a local config file :  
 ```bash
-docker run -d --rm -v /path/to/config:/etc/freenom.yml maxisoft/freenom-dns-updater-armhf
+docker run -d --rm -v /path/to/config:/etc/freenom.yml maxisoft/freenom-dns-updater
 ```
-
-### For armhf
-There's also an image for armhf (raspberry pi for instance) available at
-[maxisoft/freenom-dns-updater-armhf](https://hub.docker.com/r/maxisoft/freenom-dns-updater-armhf)
