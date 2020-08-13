@@ -75,7 +75,7 @@ class FreenomTest(unittest.TestCase):
 
     def test__get_token_no_token(self):
         six.assertRaisesRegex(self,
-                              AssertionError,
+                              RuntimeError,
                               "there's no token",
                               self.freenom._get_login_token, "http://httpbin.org/html")
 
