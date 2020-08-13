@@ -11,15 +11,15 @@ import traceback
 import warnings
 from multiprocessing import Process
 from typing import Callable, Optional
+from urllib.parse import urlparse
 
 import click
 import requests
 import six
 import yaml
-from urllib.parse import urlparse
 
 import freenom_dns_updater
-from freenom_dns_updater import Freenom, Record, Domain, Config
+from freenom_dns_updater import Config, Domain, Freenom, Record
 from freenom_dns_updater.exception import UpdateError
 from freenom_dns_updater.get_my_ip import get_my_ipv4, get_my_ipv6
 
