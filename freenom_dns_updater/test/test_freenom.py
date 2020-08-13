@@ -1,17 +1,16 @@
+import datetime
+import os
 import pathlib
 import random
 import unittest
 from copy import copy
 from pprint import pprint
 
-import datetime
 import requests
-import os
 import six
 
-from freenom_dns_updater import Freenom, Config, Domain, Record, RecordType
+from freenom_dns_updater import Config, Domain, Freenom, Record, RecordType
 from freenom_dns_updater.exception import UpdateError
-
 
 '''
 This test suite test the fdu unofficial api in real use case scenario.

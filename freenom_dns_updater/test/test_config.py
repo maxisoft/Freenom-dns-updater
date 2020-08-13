@@ -1,12 +1,13 @@
+import ipaddress
 import json
 import pathlib
 import shutil
 import tempfile
 import unittest
 
-from freenom_dns_updater import Config, Domain, Record, RecordType
 import httpretty
-import ipaddress
+
+from freenom_dns_updater import Config, Domain, Record, RecordType
 
 
 class ConfigTest(unittest.TestCase):

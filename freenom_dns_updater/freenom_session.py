@@ -19,7 +19,7 @@ class FreenomSession(requests.Session):
         if abs(self.last_request_time - time.monotonic()) < self.request_cooldown:
             time.sleep(self.request_cooldown)
         res: Optional[requests.Response] = None
-        for i in range(self.retry):
+        for _ in range(self.retry):
             res = super().request(method, url, *args, **kwargs)
             self.last_request_time = time.monotonic()
             self.previous_url = url
