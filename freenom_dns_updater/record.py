@@ -48,7 +48,7 @@ class Record(object):
 
     @property
     def type(self) -> RecordType:
-        assert self._type != RecordType.INVALID
+        assert self._type != RecordType.INVALID  # nosec
         return self._type
 
     @type.setter
@@ -64,7 +64,7 @@ class Record(object):
 
     @property
     def domain(self) -> Domain:
-        assert self._domain is not None
+        assert self._domain is not None  # nosec
         return self._domain
 
     @domain.setter

@@ -33,12 +33,14 @@ class EncryptedString:
 
     @classmethod
     def _decrypt(cls, data: bytes, key: bytes, iv: bytes, check: bool = True) -> bytes:
-        assert not check or cls.is_encrypted(data)
+        if check and not cls.is_encrypted(data):
+            raise ValueError("given data isn't encrypted")
         cls._check_key(key)
         d: bytes = data[len(cls.magic):-len(cls.magicend)]
         d = b85decode(d)
         d = aes_cbc_pkcs7_decrypt(key, d, iv)
-        assert d[-1] == 0
+        if d[-1] != 0:
+            raise ValueError("data should ends with 0x0")
         return d[:-1]
 
     @classmethod
