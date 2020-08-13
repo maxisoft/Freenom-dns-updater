@@ -6,4 +6,5 @@ flake8-isort
 flake8-pep3101
 flake8-fixme
 flake8-mutable
+bandit
 mypy;platform_python_implementation == "CPython"

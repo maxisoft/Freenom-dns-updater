@@ -10,7 +10,8 @@ class RecordParser(object):
             return []
         soup = BeautifulSoup(raw_html, "html.parser")
         tag = soup.find("input", {'name': 'dnsaction', 'value': 'modify'})
-        assert tag, "can't parse the given html"
+        if not tag:
+            raise ValueError("can't parse the given html")
         tag = tag.parent
         raw_records = tag.select("tbody > tr")
         ret = []

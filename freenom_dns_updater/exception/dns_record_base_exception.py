@@ -1,4 +1,4 @@
-class DnsRecordBaseException(Exception):
+class DnsRecordBaseException(RuntimeError):
     def __init__(self, msgs, record, old_record_list, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._msgs = msgs

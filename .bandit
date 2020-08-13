@@ -1,0 +1,2 @@
+[bandit]
+exclude: freenom_dns_updater/test

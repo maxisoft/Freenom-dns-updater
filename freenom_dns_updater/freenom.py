@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 from .domain import Domain
 from .domain_parser import DomainParser
-from .exception import AddError, UpdateError
+from .exception import AddError, RemoveError, UpdateError
 from .freenom_session import FreenomSession
 from .record import Record
 from .record_parser import RecordParser
@@ -126,7 +126,7 @@ class Freenom(object):
         if records is None:
             records = self.list_records(record.domain)
         if not self.contains_record(record, records):
-            return False
+            raise RemoveError(f"{record.name} not found in records of {record.domain.name}", record, records)
 
         payload: HttpParamDict = {'managedns': record.domain.name, 'domainid': record.domain.id}
         r = self.session.get(url, params=payload)
@@ -153,7 +153,8 @@ class Freenom(object):
         errs = soup.find_all(attrs={'class': 'dnserror'})
         if errs:
             raise UpdateError([e.text for e in errs], record, records)
-        assert len(soup.find_all(attrs={'class': 'dnssuccess'})) == 1
+        if len(soup.find_all(attrs={'class': 'dnssuccess'})) != 1:
+            raise RemoveError("didn't found success message in the html page", record, records)
         return True
 
     def get_matching_domain(self, domain: Domain, domains=None) -> Optional[Domain]:
@@ -271,5 +272,6 @@ class Freenom(object):
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         token = soup.find("input", {'name': 'token'})
-        assert token and token['value'], "there's no token on this page"
+        if not token or not token['value']:
+            raise RuntimeError("there's no token on this page")
         return token['value']

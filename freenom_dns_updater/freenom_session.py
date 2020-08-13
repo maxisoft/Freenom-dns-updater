@@ -33,7 +33,7 @@ class FreenomSession(requests.Session):
                 time.sleep(self.request_cooldown)
                 continue
             return res
-        assert res is not None
+        assert res is not None  # nosec
         return res
 
     def _decode_reason(self, reason: Union[str, bytes]) -> str:
