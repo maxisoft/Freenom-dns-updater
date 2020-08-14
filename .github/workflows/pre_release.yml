@@ -10,8 +10,29 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+        
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+  
+      - name: Install deps
+        run: |
+              pip install -r test-requirements.txt &&
+              pip install -e .
+        timeout-minutes: 3
+        
+      - name: Run python unit tests
+        run: python -m unittest discover -s ./freenom_dns_updater/test
+        timeout-minutes: 20
 
   release:
+    needs: [test]
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -93,8 +114,7 @@ jobs:
     
   publish:
     # from https://github.com/actions/create-release/issues/14#issuecomment-555379810
-    if: contains(github.ref, 'tags/v')
-    needs: [release]
+    needs: [test, release]
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -109,10 +129,6 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: release_url
-      
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
       
       - uses: actions/setup-python@v2
         with:
@@ -140,6 +156,7 @@ jobs:
               python ./waf distclean all
               cd ..
               python setup.py install
+              cd ..
 
       - name: Build the executable
         run: |
@@ -170,5 +187,5 @@ jobs:
         with:
           upload_url: ${{ steps.get_release_info.outputs.upload_url }}
           asset_path: ./${{ runner.os }}.zip
-          asset_name: ${{ steps.get_release_info.outputs.file_name }}-${{ runner.os }}.zip
+          asset_name: ${{ steps.get_release_info.outputs.file_name }}-${{ matrix.os }}.zip
           asset_content_type: application/zip
