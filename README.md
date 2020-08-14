@@ -9,7 +9,7 @@ A tool written in python to update [freenom](http://Freenom.com)'s dns records
 ## Main Features
 * Manage (add/update/remove) a domain's dns record with cli
 * Automatic records updates according to ip (v4/v6) changes
-* Auto renew domains
+* Auto renew domains (thanks to [Cedric Farinazzo](https://github.com/cedricfarinazzo))
 
 ## Upcoming features
 * Password encryption
