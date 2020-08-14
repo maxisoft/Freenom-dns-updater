@@ -129,6 +129,14 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: release_url
+
+      - name: Extract tag name
+        id: tag
+        uses: actions/github-script@0.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            return context.payload.ref.replace("refs/tags/pre", '');
       
       - uses: actions/setup-python@v2
         with:
@@ -168,16 +176,26 @@ jobs:
         with:
           files: dist/fdu/
           dest: ${{ runner.os }}.zip
-        
+
       - name: Get Release File Name & Upload URL
         id: get_release_info
+        shell: python
+        timeout-minutes: 1
         run: |
-          echo ::set-output name=file_name::${REPOSITORY_NAME##*/}-${TAG_REF_NAME##*/v} # RepositoryName-v1.0.0
-          value=`cat release_url/release_url.txt`
-          echo ::set-output name=upload_url::$value
-        env:
-          TAG_REF_NAME: ${{ github.ref }}
-          REPOSITORY_NAME: ${{ github.repository }}
+          # RepositoryName-pre1.0.0
+          repo = r'''${{ github.repository }}'''
+          repo = repo.split('/')[-1].strip()
+          tag = r'''${{ steps.tag.outputs.result }}'''
+          tag = tag.strip('"').strip()
+          print(f'::set-output name=file_name::{repo}-pre{tag}')
+
+          # upload_url
+          with open(r"release_url/release_url.txt") as f:
+            print(f"::set-output name=upload_url::{f.read().strip()}")
+          
+          # platform
+          import platform
+          print(f'::set-output name=platform::{platform.system()}-{platform.machine()}')
 
       - name: Upload Release Asset
         id: upload-release-asset 
@@ -187,5 +205,5 @@ jobs:
         with:
           upload_url: ${{ steps.get_release_info.outputs.upload_url }}
           asset_path: ./${{ runner.os }}.zip
-          asset_name: ${{ steps.get_release_info.outputs.file_name }}-${{ matrix.os }}.zip
+          asset_name: ${{ steps.get_release_info.outputs.file_name }}-${{ steps.get_release_info.outputs.platform }}.zip
           asset_content_type: application/zip
