@@ -1,0 +1,209 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release a new version
+
+on:
+  push:
+    tags:
+    - 'v*'
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+        
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+  
+      - name: Install deps
+        run: |
+              pip install -r test-requirements.txt &&
+              pip install -e .
+        timeout-minutes: 3
+        
+      - name: Run python unit tests
+        run: python -m unittest discover -s ./freenom_dns_updater/test
+        timeout-minutes: 20
+
+  release:
+    needs: [test]
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+    - name: Extract tag name
+      id: tag
+      uses: actions/github-script@0.2.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          return context.payload.ref.replace("refs/tags/v", '');
+    
+    - name: Export tag
+      run: |
+            echo "${{ steps.tag.outputs.result }}"
+            echo "::set-env name=SETUP_VERSION_OVERWRITE::${{ steps.tag.outputs.result }}"
+            echo "::set-env name=TWINE_USERNAME::__token__"
+            echo "::set-env name=TWINE_PASSWORD::${{ secrets.PYPI_TOKEN }}"
+
+
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+      
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install deps
+      run: |
+            pip install -r test-requirements.txt
+            pip install --upgrade setuptools wheel twine
+      timeout-minutes: 3
+
+    - name: Build wheel
+      run: |
+            python setup.py sdist bdist_wheel
+      timeout-minutes: 3
+
+    - 
+      name: Check with Twine
+      run: |
+            twine check dist/*
+      timeout-minutes: 3
+    
+    - 
+      name: Upload with Twine
+      run: |
+            twine upload --disable-progress-bar --non-interactive dist/*
+      timeout-minutes: 3
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Release Build
+        path: dist/*
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.tag.outputs.result }}
+        draft: true
+        prerelease: false
+
+    - name: Output Release URL File
+      run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+
+    - name: Save Release URL File for publish
+      uses: actions/upload-artifact@v1
+      with:
+        name: release_url
+        path: release_url.txt
+    
+  publish:
+    # from https://github.com/actions/create-release/issues/14#issuecomment-555379810
+    needs: [test, release]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: Load Release URL File from release job
+        uses: actions/download-artifact@v1
+        with:
+          name: release_url
+
+      - name: Extract tag name
+        id: tag
+        uses: actions/github-script@0.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            return context.payload.ref.replace("refs/tags/v", '');
+      
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Setup pip cache
+        uses: actions/cache@v2
+        timeout-minutes: 5
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-3.x-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-3.x-pip-
+
+      - name: Install deps
+        run: |
+              pip install -r test-requirements.txt &&
+              pip install -e .
+        timeout-minutes: 3
+
+      - name: Install Pyinstaller
+        run: |
+              git clone https://github.com/pyinstaller/pyinstaller.git --branch master
+              cd pyinstaller/bootloader
+              python ./waf distclean all
+              cd ..
+              python setup.py install
+              cd ..
+
+      - name: Build the executable
+        run: |
+              python -m pip uninstall -y freenom-dns-updater
+              python -O -m PyInstaller -y --clean --console freenom_dns_updater/scripts/fdu.py
+      
+      - name: Zip the executable
+        uses: papeloto/action-zip@v1
+        with:
+          files: dist/fdu/
+          dest: ${{ runner.os }}.zip
+
+      - name: Get Release File Name & Upload URL
+        id: get_release_info
+        shell: python
+        timeout-minutes: 1
+        run: |
+          # RepositoryName-v1.0.0
+          repo = r'''${{ github.repository }}'''
+          repo = repo.split('/')[-1].strip()
+          tag = r'''${{ steps.tag.outputs.result }}'''
+          tag = tag.strip('"').strip()
+          print(f'::set-output name=file_name::{repo}-v{tag}')
+
+          # upload_url
+          with open(r"release_url/release_url.txt") as f:
+            print(f"::set-output name=upload_url::{f.read().strip()}")
+          
+          # platform
+          import platform
+          print(f'::set-output name=platform::{platform.system()}-{platform.machine()}')
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
+          asset_path: ./${{ runner.os }}.zip
+          asset_name: ${{ steps.get_release_info.outputs.file_name }}-${{ steps.get_release_info.outputs.platform }}.zip
+          asset_content_type: application/zip
