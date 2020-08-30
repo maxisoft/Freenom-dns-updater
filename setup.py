@@ -1,10 +1,11 @@
 # Always prefer setuptools over distutils
-from pip._internal.req import parse_requirements
-from setuptools import setup, find_packages
+import os
 # To use a consistent encoding
 from codecs import open
 from os import path
-import os
+from pathlib import Path
+
+from setuptools import setup, find_packages
 
 here = path.abspath(path.dirname(__file__))
 
@@ -12,8 +13,22 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-install_requires = [req.req for req in parse_requirements('requirements.txt')]
-test_requires = [req.req for req in parse_requirements('test-requirements.txt')]
+
+def read_requirements(path: str):
+    res = []
+    path = Path(path)
+    with path.open(encoding='UTF-8') as f:
+        for line in f.readlines():
+            if line.startswith('-r'):
+                file = line[len('-r'):].strip()
+                res += read_requirements(Path(file))
+            else:
+                res.append(line.strip())
+    return res
+
+
+install_requires = read_requirements('requirements.txt')
+test_requires = read_requirements('test-requirements.txt')
 
 setup(
     name='freenom dns updater',
