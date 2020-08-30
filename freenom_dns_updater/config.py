@@ -73,6 +73,9 @@ class Config(dict):
             return False
         return super().__eq__(other)
 
+    def __ne__(self, other):
+        return not self == other
+
     @property
     def records(self) -> List[Record]:
         if self._records is not None:
