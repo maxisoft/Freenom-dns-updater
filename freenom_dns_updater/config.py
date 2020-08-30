@@ -68,6 +68,11 @@ class Config(dict):
     def password(self) -> str:
         return self._password.str()
 
+    def __eq__(self, other):
+        if self.password != other.password:
+            return False
+        return super().__eq__(other)
+
     @property
     def records(self) -> List[Record]:
         if self._records is not None:
