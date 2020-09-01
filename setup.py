@@ -1,9 +1,11 @@
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+import os
 # To use a consistent encoding
 from codecs import open
 from os import path
-import os
+from pathlib import Path
+
+from setuptools import setup, find_packages
 
 here = path.abspath(path.dirname(__file__))
 
@@ -11,13 +13,22 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-with open('requirements.txt', encoding='utf-8') as f:
-    install_requires = map(lambda line: line.strip(), f.readlines())
-    install_requires = filter(lambda line: bool(line), install_requires)
 
-with open('test-requirements.txt', encoding='utf-8') as f:
-    test_requires = map(lambda line: line.strip(), f.readlines())
-    test_requires = filter(lambda line: bool(line), install_requires)
+def read_requirements(path: str):
+    res = []
+    path = Path(path)
+    with path.open(encoding='UTF-8') as f:
+        for line in f.readlines():
+            if line.startswith('-r'):
+                file = line[len('-r'):].strip()
+                res += read_requirements(Path(file))
+            else:
+                res.append(line.strip())
+    return res
+
+
+install_requires = read_requirements('requirements.txt')
+test_requires = read_requirements('test-requirements.txt')
 
 setup(
     name='freenom dns updater',
@@ -80,7 +91,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=list(install_requires),
+    install_requires=install_requires,
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -88,7 +99,7 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'dev': ['check-manifest'],
-        'test': list(test_requires),
+        'test': test_requires,
     },
 
     # If there are data files included in your packages that need to be

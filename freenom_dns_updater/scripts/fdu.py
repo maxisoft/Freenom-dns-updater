@@ -407,8 +407,6 @@ def process(config, period, ignore_errors, cache, renew):
                     new_ipv6 = str(get_my_ipv6())
                 except OSError:
                     pass
-                except requests.exceptions.ConnectionError:
-                    pass
                 except Exception:
                     warnings.warn(traceback.format_exc())
                 update_needed = ipv4 != new_ipv4 or ipv6 != new_ipv6
