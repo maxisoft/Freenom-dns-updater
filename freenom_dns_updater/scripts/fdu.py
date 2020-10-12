@@ -354,6 +354,44 @@ def domain_ls(user, password, format):
     click.echo(format_data(domains, format))
 
 
+@domain.command('forward', help='Forward a Domain or print the current forward domain.')
+@click.argument('user')
+@click.argument('password')
+@click.argument('domain')
+@click.option('-u', '--url', help="The forward url")
+@click.option('-m', '--mode', help='How to point to the domain either "301_redirect" or "cloak"', default="cloak", type=click.Choice(("301_redirect","cloak")))
+@click.help_option('--help', '-h')
+def domain_forward(user, password, domain, url, mode):
+    freenom = freenom_dns_updater.Freenom()
+    if not freenom.login(user, password):
+        click.secho('Unable to login with the given credential', fg='red', bold=True)
+        sys.exit(6)
+    # search the domain
+    for d in freenom.list_domains():
+        if d.name == domain:
+            domain = d
+            break
+    if not isinstance(domain, freenom_dns_updater.Domain):
+        click.secho(f"You don't own the domain \"{domain}\"", fg='yellow', bold=True)
+        sys.exit(7)
+    try:
+        cururl, curmode = freenom.current_url_forward(domain.id)
+    except Exception:
+        cururl = None
+        curmode = None
+
+    click.echo("Current: " + domain.name + " --" + curmode + "--> " + cururl)
+
+    if url is None:
+        return
+    if cururl == url and curmode == mode:
+        click.echo("Forward already set")
+        return
+
+    freenom.change_url_forward(domain.id,url,mode)
+    click.echo("New set: " + domain.name + " --" + mode + "--> " + url)
+
+
 @domain.command('renew', help='Renew a domain for X months')
 @click.argument('user')
 @click.argument('password')

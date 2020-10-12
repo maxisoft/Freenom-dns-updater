@@ -20,6 +20,8 @@ PARSED_FREENOM_BASE_URL = urlparse(FREENOM_BASE_URL)
 LOGIN_URL = urljoin(FREENOM_BASE_URL, 'dologin.php')
 CLIENT_AREA_URL = urljoin(FREENOM_BASE_URL, 'clientarea.php')
 LIST_DOMAIN_URL = f'{CLIENT_AREA_URL}?action=domains'
+DOMAIN_FORWARD_URL = f'{CLIENT_AREA_URL}?action=domaindetails'
+
 
 HttpParamDict = Dict[str, Union[None, str, int, float]]
 
@@ -52,6 +54,39 @@ class Freenom(object):
         r = self.session.post(url, payload)
         r.raise_for_status()
         return DomainParser.parse(r.text)
+
+    def current_url_forward(self, id_):
+        url = DOMAIN_FORWARD_URL + "&id="+str(id_)+"&modop=custom&a=urlforwarding"
+        token = self._get_domain_token(url)
+        payload: HttpParamDict = {'token': token}
+        r = self.session.post(url,payload)
+        r.raise_for_status()
+
+        soup = BeautifulSoup(r.text, "html.parser")
+        urlelem = soup.find("input", {'id': 'url'})
+        modeelem = soup.find("option",{"selected":"selected"})
+        if not urlelem or not modeelem:
+            raise ValueError("can't parse the given html")
+        forwardurl = urlelem["value"]
+        mode = modeelem["value"]
+        return forwardurl, mode
+
+    def change_url_forward(self, id_, newurl, mode, url: str = DOMAIN_FORWARD_URL):
+        token = self._get_token(url)
+        payload: HttpParamDict = {'token': token}
+        payload["id"] = str(id_)
+        payload["modop"] = "custom"
+        payload["a"] = "urlforwarding"
+        payload["save"] = "true"
+        payload["url"] = str(newurl)
+        payload["mode"] = str(mode)
+        r = self.session.post(url, payload)
+
+        soup = BeautifulSoup(r.text, "html.parser")
+        errs = soup.find_all(attrs={'class': 'dnserror'})
+        if errs:
+            raise AddError([e.text for e in errs], record, records)
+        return len(soup.find_all(attrs={'class': 'dnssuccess'}))
 
     def list_records(self, domain: Domain):
         url = self.manage_domain_url(domain)
