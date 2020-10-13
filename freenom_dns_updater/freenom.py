@@ -82,13 +82,6 @@ class Freenom(object):
         payload["mode"] = str(mode)
         r = self.session.post(url, payload)
 
-        # There should not occur any dnserror
-        soup = BeautifulSoup(r.text, "html.parser")
-        errs = soup.find_all(attrs={'class': 'dnserror'})
-        if errs:
-            raise AddError([e.text for e in errs])
-        return len(soup.find_all(attrs={'class': 'dnssuccess'}))
-
     def list_records(self, domain: Domain):
         url = self.manage_domain_url(domain)
         r = self.session.get(url)
