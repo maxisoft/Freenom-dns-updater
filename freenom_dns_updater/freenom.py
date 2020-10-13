@@ -81,6 +81,7 @@ class Freenom(object):
         payload["url"] = str(newurl)
         payload["mode"] = str(mode)
         r = self.session.post(url, payload)
+        return newurl in r.text
 
     def list_records(self, domain: Domain):
         url = self.manage_domain_url(domain)

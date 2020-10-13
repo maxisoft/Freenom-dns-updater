@@ -389,8 +389,10 @@ def domain_forward(user, password, domain, url, mode):
         click.echo("Forward already set")
         return
 
-    freenom.change_url_forward(domain.id, url, mode)
-    click.echo("New set: " + domain.name + " --" + mode + "--> " + url)
+    if freenom.change_url_forward(domain.id, url, mode):
+        click.echo("New set: " + domain.name + " --" + mode + "--> " + url)
+    else:
+        click.echo("Something went wrong!")
 
 
 @domain.command('renew', help='Renew a domain for X months')
