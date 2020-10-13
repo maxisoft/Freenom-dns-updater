@@ -359,7 +359,8 @@ def domain_ls(user, password, format):
 @click.argument('password')
 @click.argument('domain')
 @click.option('-u', '--url', help="The forward url")
-@click.option('-m', '--mode', help='How to point to the domain either "301_redirect" or "cloak"', default="cloak", type=click.Choice(("301_redirect","cloak")))
+@click.option('-m', '--mode', help='How to point to the domain either "301_redirect" or "cloak"',
+              default="cloak", type=click.Choice(("301_redirect", "cloak")))
 @click.help_option('--help', '-h')
 def domain_forward(user, password, domain, url, mode):
     freenom = freenom_dns_updater.Freenom()
@@ -388,7 +389,7 @@ def domain_forward(user, password, domain, url, mode):
         click.echo("Forward already set")
         return
 
-    freenom.change_url_forward(domain.id,url,mode)
+    freenom.change_url_forward(domain.id, url, mode)
     click.echo("New set: " + domain.name + " --" + mode + "--> " + url)
 
 

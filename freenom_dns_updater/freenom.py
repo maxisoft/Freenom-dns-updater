@@ -59,12 +59,12 @@ class Freenom(object):
         url = DOMAIN_FORWARD_URL + "&id="+str(id_)+"&modop=custom&a=urlforwarding"
         token = self._get_domain_token(url)
         payload: HttpParamDict = {'token': token}
-        r = self.session.post(url,payload)
+        r = self.session.post(url, payload)
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
         urlelem = soup.find("input", {'id': 'url'})
-        modeelem = soup.find("option",{"selected":"selected"})
+        modeelem = soup.find("option", {"selected": "selected"})
         if not urlelem or not modeelem:
             raise ValueError("can't parse the given html")
         forwardurl = urlelem["value"]
@@ -82,10 +82,11 @@ class Freenom(object):
         payload["mode"] = str(mode)
         r = self.session.post(url, payload)
 
+        # There should not occur any dnserror
         soup = BeautifulSoup(r.text, "html.parser")
         errs = soup.find_all(attrs={'class': 'dnserror'})
         if errs:
-            raise AddError([e.text for e in errs], record, records)
+            raise AddError([e.text for e in errs])
         return len(soup.find_all(attrs={'class': 'dnssuccess'}))
 
     def list_records(self, domain: Domain):
