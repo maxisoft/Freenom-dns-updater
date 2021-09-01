@@ -29,7 +29,7 @@ pip install freenom-dns-updater
 Let's say you want to add or update your main A/AAAA domain records *exemple.tk* with your current ip (v4/v6).
 Simply type :
 ```
-fdu record update $LOGIN $PASSWORD exemple.tk
+fdu record update $LOGIN $PASSWORD example.tk
 ```
 
 Note that if you don't have a ipv6 access, the tool will detect that and will update only the A record (ipv4) of *example.tk*.
