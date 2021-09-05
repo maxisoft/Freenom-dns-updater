@@ -354,6 +354,86 @@ def domain_ls(user, password, format):
     click.echo(format_data(domains, format))
 
 
+@domain.command('nameserver', help='List or change current nameservers.')
+@click.argument('user')
+@click.argument('password')
+@click.argument('domain')
+@click.option('-n', '--nameserver', help="A nameserver to set (can be used up to 5 times)", multiple=True, is_flag=False, flag_value="None")
+@click.help_option('--help', '-h')
+def domain_nameserver(user, password, domain, nameserver):
+    freenom = freenom_dns_updater.Freenom()
+    if not freenom.login(user, password):
+        click.secho('Unable to login with the given credential', fg='red', bold=True)
+        sys.exit(6)
+    # search the domain
+    for d in freenom.list_domains():
+        if d.name == domain:
+            domain = d
+            break
+    if not isinstance(domain, freenom_dns_updater.Domain):
+        click.secho(f"You don't own the domain \"{domain}\"", fg='yellow', bold=True)
+        sys.exit(7)
+    if not nameserver:
+        mode, nameservers = freenom.get_nameserver(domain.id)
+        if mode == "default":
+            click.echo("Using default freenom nameserver")
+        else:
+            for i, elem in enumerate(nameservers):
+                click.echo("Nameserver {}: {}".format(i+1, elem))
+    else:
+        for i, ns in enumerate(nameserver):
+            if not isinstance(ns, str) or ns == "None":
+                nameserver[i] = ""
+        if freenom.set_nameserver(domain, nameserver):
+            if len("".join(nameserver)) > 0:
+                click.echo("Nameserver set")
+            else:
+                click.echo("Namerserver removed. Turned back to freenom nameserver.")
+        else:
+            click.echo("Something went wrong!")
+
+
+@domain.command('forward', help='Forward a Domain or print the current forward domain.')
+@click.argument('user')
+@click.argument('password')
+@click.argument('domain')
+@click.option('-u', '--url', help="The forward url")
+@click.option('-m', '--mode', help='How to point to the domain either "301_redirect" or "cloak"',
+              default="cloak", type=click.Choice(("301_redirect", "cloak")))
+@click.help_option('--help', '-h')
+def domain_forward(user, password, domain, url, mode):
+    freenom = freenom_dns_updater.Freenom()
+    if not freenom.login(user, password):
+        click.secho('Unable to login with the given credential', fg='red', bold=True)
+        sys.exit(6)
+    # search the domain
+    for d in freenom.list_domains():
+        if d.name == domain:
+            domain = d
+            break
+    if not isinstance(domain, freenom_dns_updater.Domain):
+        click.secho(f"You don't own the domain \"{domain}\"", fg='yellow', bold=True)
+        sys.exit(7)
+    try:
+        cururl, curmode = freenom.current_url_forward(domain.id)
+    except Exception:
+        cururl = None
+        curmode = None
+
+    click.echo("Current: " + domain.name + " --" + curmode + "--> " + cururl)
+
+    if url is None:
+        return
+    if cururl == url and curmode == mode:
+        click.echo("Forward already set")
+        return
+
+    if freenom.change_url_forward(domain.id, url, mode):
+        click.echo("New set: " + domain.name + " --" + mode + "--> " + url)
+    else:
+        click.echo("Something went wrong!")
+
+
 @domain.command('renew', help='Renew a domain for X months')
 @click.argument('user')
 @click.argument('password')
