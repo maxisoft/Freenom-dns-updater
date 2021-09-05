@@ -253,24 +253,53 @@ class Freenom(object):
             return 'Order Confirmation' in r.text
         return False
 
+    def get_nameserver(self, id_):
+        url = DOMAIN_FORWARD_URL + "&id="+str(id_)
+        token = self._get_domain_token(url)
+        payload: HttpParamDict = {'token': token}
+        r = self.session.post(url, payload)
+        r.raise_for_status()
+
+        soup = BeautifulSoup(r.text, "html.parser")
+        radios = soup.find_all("input", {"type":"radio", "name":"nschoice"})
+        for nschoice in radios:
+            if nschoice.has_attr("checked"):
+                nschoice = nschoice["value"]
+                break
+
+        nameservers = []
+        if nschoice == "custom":
+            for i in range(1, 6):
+                ns = soup.find("input", {"id": "ns{}".format(i)})
+                nameservers.append(ns["value"])
+        return nschoice, nameservers
+
     def set_nameserver(self, domain, ns):
         if domain is None:
             return False
-        url = urljoin(FREENOM_BASE_URL, f'clientarea.php?action=domaindetails&id={quote(domain.id)}')
+        url = urljoin(DOMAIN_FORWARD_URL, f'&id={quote(domain.id)}')
         i = 1
         token = self._get_set_ns_token(domain)
-        params: HttpParamDict = {
-            'id': domain.id,
-            'token': token,
-            'sub': 'savens',
-            'nschoice': 'custom'
-        }
-        for e in ns:
-            params[f'ns{i}'] = e
-            i += 1
-        while i <= 5:
-            params[f'ns{i}'] = ''
-            i += 1
+        if len("".join(ns)) > 0:
+            params: HttpParamDict = {
+                'id': domain.id,
+                'token': token,
+                'sub': 'savens',
+                'nschoice': 'custom'
+            }
+            for e in ns:
+                params[f'ns{i}'] = e
+                i += 1
+            while i <= 5:
+                params[f'ns{i}'] = ''
+                i += 1
+        else:
+            params: HttpParamDict = {
+                'id': domain.id,
+                'token': token,
+                'sub': 'savens',
+                'nschoice': 'default'
+            }
         headers = {'Referer': url}
         r = self.session.post(url, params, headers=headers)
         r.raise_for_status()
